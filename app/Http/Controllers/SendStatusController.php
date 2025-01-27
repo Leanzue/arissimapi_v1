@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\SendStatus;
+use App\Models\SendResult;
 use App\Http\Requests\StoreSendStatusRequest;
 use App\Http\Requests\UpdateSendStatusRequest;
 
@@ -13,7 +14,8 @@ class SendStatusController extends Controller
      */
     public function index()
     {
-        //
+        $sendStatuses = SendStatus::all();
+        return $sendStatuses;
     }
 
     /**
@@ -29,7 +31,13 @@ class SendStatusController extends Controller
      */
     public function store(StoreSendStatusRequest $request)
     {
-        //
+
+        $sendStatus = SendStatus::create([
+            'priority' => $request->priority,
+            'libellé' => $request->libellé,
+        ]);
+
+        return response($sendStatus, 201);
     }
 
     /**
@@ -37,7 +45,7 @@ class SendStatusController extends Controller
      */
     public function show(SendStatus $sendStatus)
     {
-        //
+        return $sendStatus;
     }
 
     /**
@@ -53,7 +61,12 @@ class SendStatusController extends Controller
      */
     public function update(UpdateSendStatusRequest $request, SendStatus $sendStatus)
     {
-        //
+        $sendStatus->update([
+            'priority' => $request->priority,
+            'libellé' => $request->libellé,
+        ]);
+
+        return $sendStatus;
     }
 
     /**
@@ -61,6 +74,8 @@ class SendStatusController extends Controller
      */
     public function destroy(SendStatus $sendStatus)
     {
-        //
+        $sendStatus->delete();
+
+        return null;
     }
 }

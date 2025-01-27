@@ -13,7 +13,8 @@ class SendAttemptResultController extends Controller
      */
     public function index()
     {
-        //
+        $sendAttemptResults = SendAttemptResult::all();
+        return $sendAttemptResults;
     }
 
     /**
@@ -29,7 +30,14 @@ class SendAttemptResultController extends Controller
      */
     public function store(StoreSendAttemptResultRequest $request)
     {
-        //
+        $sendAttemptResult = SendAttemptResult::create([
+            'date_of_sending_results' => $request->date_of_sending_results,
+            'details' => $request->details,
+            'error_code' => $request->error_code,
+            'nombre_de_tentative' => $request->nombre_de_tentative,
+        ]);
+
+        return response($sendAttemptResult, 201);
     }
 
     /**
@@ -37,7 +45,7 @@ class SendAttemptResultController extends Controller
      */
     public function show(SendAttemptResult $sendAttemptResult)
     {
-        //
+        return $sendAttemptResult;
     }
 
     /**
@@ -53,7 +61,14 @@ class SendAttemptResultController extends Controller
      */
     public function update(UpdateSendAttemptResultRequest $request, SendAttemptResult $sendAttemptResult)
     {
-        //
+        $sendAttemptResult->update([
+            'date_of_sending_results' => $request->date_of_sending_results,
+            'details' => $request->details,
+            'error_code' => $request->error_code,
+            'nombre_de_tentative' => $request->nombre_de_tentative,
+        ]);
+
+        return $sendAttemptResult;
     }
 
     /**
@@ -61,6 +76,8 @@ class SendAttemptResultController extends Controller
      */
     public function destroy(SendAttemptResult $sendAttemptResult)
     {
-        //
+        $sendAttemptResult->delete();
+
+        return null;
     }
 }

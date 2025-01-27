@@ -20,10 +20,9 @@ return new class extends Migration
         Schema::create($this->table_name, function (Blueprint $table) {
             $table->id();
             $table->string('description')->comment('description de la requête');
-            $table->string('adresse')->comment('adresse de la Sim');
+            $table->string('adresse ip')->comment('adresse de la Sim');
             $table->date('date')->comment('date de résolution de la requête');
-            $table->integer('creation')->comment('création de la requête');
-            $table->integer('code')->comment('genération du code requete');
+            $table->string('code')->comment('genération du code requete');
 
             $table->foreignId('request_status_id')->nullable()
                 ->comment('request_status_reference')

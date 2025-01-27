@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\RequestType;
+use App\Models\RequestStatus;
 use App\Http\Requests\StoreRequestTypeRequest;
 use App\Http\Requests\UpdateRequestTypeRequest;
 
@@ -13,7 +14,8 @@ class RequestTypeController extends Controller
      */
     public function index()
     {
-        //
+        $requestTypes = RequestType::all();
+        return $requestTypes;
     }
 
     /**
@@ -29,17 +31,23 @@ class RequestTypeController extends Controller
      */
     public function store(StoreRequestTypeRequest $request)
     {
-        //
+        $requestType = RequestType::create([
+            'action' => $request->action,
+            'libellé' => $request->libellé,
+        ]);
+        return response()($requestType, 201);
     }
 
     /**
      * Display the specified resource.
+     * @param RequestType $requestType
+     * @param $request
+     * @return
      */
-    public function show(RequestType $requestType)
+    public function show(RequestType $requestType, $request)
     {
-        //
+        return $requestType;
     }
-
     /**
      * Show the form for editing the specified resource.
      */
@@ -50,10 +58,18 @@ class RequestTypeController extends Controller
 
     /**
      * Update the specified resource in storage.
+     * @param UpdateRequestTypeRequest $request
+     * @param RequestType $requestType
+     * @param $requestTypes
+     * @return
      */
-    public function update(UpdateRequestTypeRequest $request, RequestType $requestType)
+    public function update(UpdateRequestTypeRequest $request, RequestType $requestType, $requestTypes)
     {
-        //
+        $requestType = RequestType::create([
+            'action' => $request->action,
+            'libellé' => $request->libellé,
+        ]);
+        return $requestTypes;
     }
 
     /**
@@ -61,6 +77,8 @@ class RequestTypeController extends Controller
      */
     public function destroy(RequestType $requestType)
     {
-        //
+        $requestType->delete();
+
+        return null;
     }
 }

@@ -13,7 +13,8 @@ class SimRequestController extends Controller
      */
     public function index()
     {
-        //
+        $simRequests = SimRequest::all();
+        return $simRequests;
     }
 
     /**
@@ -29,7 +30,14 @@ class SimRequestController extends Controller
      */
     public function store(StoreSimRequestRequest $request)
     {
-        //
+        $simRequest = SimRequest::create([
+            'description' => $request->description,
+            'adresse' => $request->adresse,
+            'date' => $request->date,
+            'code' => $request->code,
+        ]);
+
+        return response($simRequest, 201);
     }
 
     /**
@@ -37,7 +45,7 @@ class SimRequestController extends Controller
      */
     public function show(SimRequest $simRequest)
     {
-        //
+       return $simRequest;
     }
 
     /**
@@ -53,7 +61,14 @@ class SimRequestController extends Controller
      */
     public function update(UpdateSimRequestRequest $request, SimRequest $simRequest)
     {
-        //
+        $simRequest->update([
+            'description' => $request->description,
+            'adresse' => $request->adresse,
+            'date' => $request->date,
+            'code' => $request->code,
+        ]);
+
+        return $simRequest;
     }
 
     /**
@@ -61,6 +76,8 @@ class SimRequestController extends Controller
      */
     public function destroy(SimRequest $simRequest)
     {
-        //
+        $simRequest->delete();
+
+        return null;
     }
 }

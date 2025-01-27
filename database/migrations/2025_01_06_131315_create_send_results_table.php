@@ -20,7 +20,7 @@ return new class extends Migration
         Schema::create($this->table_name, function (Blueprint $table) {
             $table->id();
             $table->string('result_description')->comment('description des résultats');
-            $table->date('nombre_tentative')->comment('le nombre de tentative');
+            $table->integer('nombre_tentative')->comment('le nombre de tentative');
             $table->date('date_envoi')->comment('la date envoie');
             $table->string('error_code')->comment('code erreur');
 

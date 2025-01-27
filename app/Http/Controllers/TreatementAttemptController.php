@@ -13,7 +13,8 @@ class TreatementAttemptController extends Controller
      */
     public function index()
     {
-        //
+        $treatementAttempts = TreatementAttempt::all();
+        return $treatementAttempts;
     }
 
     /**
@@ -29,7 +30,14 @@ class TreatementAttemptController extends Controller
      */
     public function store(StoreTreatementAttemptRequest $request)
     {
-        //
+        $treatementAttempt = TreatementAttempt::create([
+            'date_debut' => $request->date_debut,
+            'date_fin' => $request->date_fin,
+            'resultat' => $request->resultat,
+            'description' => $request->description,
+        ]);
+
+        return response($treatementAttempt, 201);
     }
 
     /**
@@ -37,7 +45,7 @@ class TreatementAttemptController extends Controller
      */
     public function show(TreatementAttempt $treatementAttempt)
     {
-        //
+        return $treatementAttempt;
     }
 
     /**
@@ -53,7 +61,14 @@ class TreatementAttemptController extends Controller
      */
     public function update(UpdateTreatementAttemptRequest $request, TreatementAttempt $treatementAttempt)
     {
-        //
+        $treatementAttempt->update([
+            'date_debut' => $request->date_debut,
+            'date_fin' => $request->date_fin,
+            'resultat' => $request->resultat,
+            'description' => $request->description,
+        ]);
+
+        return $treatementAttempt;
     }
 
     /**
@@ -61,6 +76,8 @@ class TreatementAttemptController extends Controller
      */
     public function destroy(TreatementAttempt $treatementAttempt)
     {
-        //
+        $treatementAttempt->delete();
+
+        return null;
     }
 }

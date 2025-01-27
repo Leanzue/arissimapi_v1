@@ -18,6 +18,7 @@ return new class extends Migration
     {
         Schema::create($this->table_name, function (Blueprint $table) {
             $table->id();
+            $table->string('action')->comment('les actions sur la requete');
             $table->string('libellé')->comment('les références');
 
             $table->baseFields();

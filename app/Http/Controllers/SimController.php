@@ -13,7 +13,8 @@ class SimController extends Controller
      */
     public function index()
     {
-        //
+        $sims = Sim::all();
+        return $sims;
     }
 
     /**
@@ -29,7 +30,14 @@ class SimController extends Controller
      */
     public function store(StoreSimRequest $request)
     {
-        //
+        $sim = Sim::create([
+            'iccid' => $request->iccid,
+            'imsi' => $request->imsi,
+            'puk' => $request->puk,
+            'pin' => $request->pin,
+        ]);
+
+        return response($sim, 201);
     }
 
     /**
@@ -37,7 +45,7 @@ class SimController extends Controller
      */
     public function show(Sim $sim)
     {
-        //
+        return $sim;
     }
 
     /**
@@ -53,7 +61,15 @@ class SimController extends Controller
      */
     public function update(UpdateSimRequest $request, Sim $sim)
     {
-        //
+
+        $sim->update([
+            'iccid' => $request->iccid,
+            'imsi' => $request->imsi,
+            'puk' => $request->puk,
+            'pin' => $request->pin,
+        ]);
+
+        return $sim;
     }
 
     /**
@@ -61,6 +77,8 @@ class SimController extends Controller
      */
     public function destroy(Sim $sim)
     {
-        //
+        $sim->delete();
+
+        return null;
     }
 }

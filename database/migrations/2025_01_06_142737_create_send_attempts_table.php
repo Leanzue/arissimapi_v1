@@ -19,8 +19,8 @@ return new class extends Migration
     {
         Schema::create($this->table_name, function (Blueprint $table) {
             $table->id();
-            $table->integer('response_data')->nullable()->comment('les données de réponses');
-            $table->integer('response_time')->comment('temps établi pour envoi de la réponse');
+            $table->string('response_data')->nullable()->comment('les données de réponses');
+            $table->string('response_time')->comment('temps établi pour envoi de la réponse');
 
             $table->foreignId('send_status_id')->nullable()
             ->comment('send_status_reference')

@@ -13,8 +13,10 @@ class SendResultController extends Controller
      */
     public function index()
     {
-        //
+        $sendResults = SendResult::all();
+        return $sendResults;
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -29,7 +31,14 @@ class SendResultController extends Controller
      */
     public function store(StoreSendResultRequest $request)
     {
-        //
+        $sendResult = SendResult::create([
+            'result_description' => $request->result_description,
+            'nombre_tentative' => $request->nombre_tentative,
+            'date_envoi' => $request->date_envoi,
+            'error_code' => $request->error_code,
+        ]);
+
+        return response()(sendResult, 201);
     }
 
     /**
@@ -37,7 +46,7 @@ class SendResultController extends Controller
      */
     public function show(SendResult $sendResult)
     {
-        //
+        return $sendResult;
     }
 
     /**
@@ -53,7 +62,13 @@ class SendResultController extends Controller
      */
     public function update(UpdateSendResultRequest $request, SendResult $sendResult)
     {
-        //
+        $sendResult->update([
+            'result_description' => $request->result_description,
+            'nombre_tentative' => $request->nombre_tentative,
+            'date_envoi' => $request->date_envoi,
+            'error_code' => $request->error_code,
+        ]);
+        return $sendResult;
     }
 
     /**
@@ -61,6 +76,8 @@ class SendResultController extends Controller
      */
     public function destroy(SendResult $sendResult)
     {
-        //
+        $sendResult->delete();
+
+        return null;
     }
 }

@@ -13,7 +13,9 @@ class SendAttemptController extends Controller
      */
     public function index()
     {
-        //
+
+        $sendAttempts = SendAttempt::all();
+        return $sendAttempts;
     }
 
     /**
@@ -29,7 +31,12 @@ class SendAttemptController extends Controller
      */
     public function store(StoreSendAttemptRequest $request)
     {
-        //
+        $sendAttempt = SendAttempt::create([
+        'response_data' => $request->response_data,
+        'response_time' => $request->response_time,
+    ]);
+
+        return response()($sendAttempt, 201);
     }
 
     /**
@@ -37,7 +44,7 @@ class SendAttemptController extends Controller
      */
     public function show(SendAttempt $sendAttempt)
     {
-        //
+        return $sendAttempt;
     }
 
     /**
@@ -53,7 +60,12 @@ class SendAttemptController extends Controller
      */
     public function update(UpdateSendAttemptRequest $request, SendAttempt $sendAttempt)
     {
-        //
+        $sendAttempt->update([
+            'response_data' => $request->response_data,
+            'response_time' => $request->response_time,
+        ]);
+
+        return $sendAttempt;
     }
 
     /**
@@ -61,6 +73,8 @@ class SendAttemptController extends Controller
      */
     public function destroy(SendAttempt $sendAttempt)
     {
-        //
+        $sendAttempt->delete();
+
+        return null;
     }
 }

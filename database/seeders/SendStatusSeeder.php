@@ -2,7 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\SendStatus;
+use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 
 class SendStatusSeeder extends Seeder
@@ -12,6 +13,22 @@ class SendStatusSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        $data = [
+            [
+                'uuid' => (string) Str::uuid(),
+                'priority' => 'haute',
+                'libellé' => 'En cours de traitement',
+            ],
+            [
+                'uuid' => (string) Str::uuid(),
+                'priority' => 'basse',
+                'libellé' => 'En attente',
+            ],
+
+        ];
+
+        foreach ($data as $entry) {
+            SendStatus::create($entry);
+        }
     }
 }

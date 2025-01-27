@@ -2,7 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Support\Str;
+use App\Models\SendAttempt;
 use Illuminate\Database\Seeder;
 
 class SendAttemptSeeder extends Seeder
@@ -12,6 +13,21 @@ class SendAttemptSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        $data = [
+            [
+                'uuid' => (string) Str::uuid(),
+                'response_data' => 'Réponse créée avec succès',
+                'response_time' => '2025-01-15 10:30:00',
+            ],
+            [
+                'uuid' => (string) Str::uuid(),
+                'response_data' => 'Réponse mise à jour avec succès',
+                'response_time' => '2025-01-15 10:35:00',
+            ],
+        ];
+
+        foreach ($data as $entry) {
+            SendAttempt::create($entry);
+        }
     }
 }

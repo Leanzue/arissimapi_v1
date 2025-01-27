@@ -13,7 +13,8 @@ class RequestStatusController extends Controller
      */
     public function index()
     {
-        //
+        $requestStatuses = RequestStatus::all();
+        return $requestStatuses;
     }
 
     /**
@@ -21,7 +22,7 @@ class RequestStatusController extends Controller
      */
     public function create()
     {
-        //
+
     }
 
     /**
@@ -29,15 +30,23 @@ class RequestStatusController extends Controller
      */
     public function store(StoreRequestStatusRequest $request)
     {
-        //
+        $requestStatus = RequestStatus::create([
+            'priority' => $request->priority,
+            'libellé' => $request->libellé,
+        ]);
+
+        return response()(requestStatus, 201);
     }
 
     /**
      * Display the specified resource.
+     * @param RequestStatus $requestStatus
+     * @param $requestStatuses
+     * @return
      */
-    public function show(RequestStatus $requestStatus)
+    public function show(RequestStatus $requestStatus, $requestStatuses)
     {
-        //
+        return $requestStatuses;
     }
 
     /**
@@ -50,10 +59,20 @@ class RequestStatusController extends Controller
 
     /**
      * Update the specified resource in storage.
+     * @param UpdateRequestStatusRequest $request
+     * @param RequestStatus $requestStatus
+     * @param $requestStatuses
+     * @return
      */
-    public function update(UpdateRequestStatusRequest $request, RequestStatus $requestStatus)
+    public function update(UpdateRequestStatusRequest $request, RequestStatus $requestStatus, $requestStatuses)
     {
-        //
+
+        $requestStatus->update([
+            'priority' => $request->priority,
+            'libellé' => $request->libellé,
+        ]);
+
+        return $requestStatuses;
     }
 
     /**
@@ -61,6 +80,7 @@ class RequestStatusController extends Controller
      */
     public function destroy(RequestStatus $requestStatus)
     {
-        //
+        $requestStatus->delete();
+        return null;
     }
 }
