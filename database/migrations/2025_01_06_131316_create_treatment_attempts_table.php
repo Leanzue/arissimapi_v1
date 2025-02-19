@@ -9,7 +9,7 @@ return new class extends Migration
 {    use BaseMigrationTrait;
 
     public $table_name = 'treatement_attempts';
-    public $table_comment = 'treatementattempts of objects in the system.';
+    public $table_comment = 'treatmentattempts of objects in the system.';
 
     public function up(): void
     {    {
