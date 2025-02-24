@@ -17,11 +17,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('request_statuses', function (Blueprint $table) {
-            $table->id();
-
-            $table->string('priority')->comment('détermine la priorité');
-            $table->string('libellé');
+        Schema::create($this->table_name, function (Blueprint $table) {
+        $table->id();
+        $table ->string('priority')->comment('détermine la priorité');
+         $table->string('libelle')->comment('determine le statut');
+         $table->string('code')->comment('code du statut ');
+         $table->string('description')->comment('description');
 
             $table->baseFields();
         });

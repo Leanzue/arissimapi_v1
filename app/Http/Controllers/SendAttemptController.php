@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\SendAttempt;
-use App\Http\Requests\StoreSendAttemptRequest;
-use App\Http\Requests\UpdateSendAttemptRequest;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Schema;
+use App\Http\Requests\SendAttempt\StoreSendAttemptRequest;
+use App\Http\Requests\SendAttempt\UpdateSendAttemptRequest;
 
 class SendAttemptController extends Controller
 {
@@ -13,9 +16,9 @@ class SendAttemptController extends Controller
      */
     public function index()
     {
+        $sendattempts = SendAttempt::all();
 
-        $sendAttempts = SendAttempt::all();
-        return $sendAttempts;
+        return view('sendattempts.index', compact('sendattempts'));
     }
 
     /**
@@ -23,21 +26,29 @@ class SendAttemptController extends Controller
      */
     public function create()
     {
-        //
+        return view('sendattempts.create');
     }
 
     /**
      * Store a newly created resource in storage.
+     * @param StoreSendAttemptRequest $request
+     * @param $sendAttempt
+     * @return
      */
-    public function store(StoreSendAttemptRequest $request)
-    {
+    protected function store(storeSendAttemptRequest $request)
+    {   dd($request->all());
         $sendAttempt = SendAttempt::create([
-        'response_data' => $request->response_data,
-        'response_time' => $request->response_time,
-    ]);
+            'uuid' => Str::uuid()->toString(),
+            'response_data' => $request->response_data,
+            'response_time' => $request->response_time ?? now(),
+        ]);
 
-        return response()($sendAttempt, 201);
+
+        return response()->json($sendAttempt, 201);
+
+
     }
+
 
     /**
      * Display the specified resource.
@@ -52,29 +63,36 @@ class SendAttemptController extends Controller
      */
     public function edit(SendAttempt $sendAttempt)
     {
-        //
+        return view('sendattempts.edit', compact('sendAttempt'));
     }
 
     /**
      * Update the specified resource in storage.
+     * @param UpdateSendAttemptRequest $request
+     * @param SendAttempt $sendAttempt
+     * @return
      */
-    public function update(UpdateSendAttemptRequest $request, SendAttempt $sendAttempt)
+    public function update(UpdateSendAttemptRequest $request, SendAttempt $sendAttempt,  $sendattempt)
     {
         $sendAttempt->update([
-            'response_data' => $request->response_data,
-            'response_time' => $request->response_time,
+            'response_data' => $request->input('response_data'),
+            'response_time' => $request->input('response_time'),
         ]);
 
-        return $sendAttempt;
+        return response()->json($sendAttempt);;
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(SendAttempt $sendAttempt)
+    public function destroy(SendAttempt $sendattempts)
     {
-        $sendAttempt->delete();
 
-        return null;
+        $sendattempts->delete();
+        return redirect()->route('sendattempts.index')->with('success', 'Résultat de tentative d\'envoi supprimé avec succès.');
     }
+
+    /**
+     * Additional methods and functionalities can be added here
+     */
 }

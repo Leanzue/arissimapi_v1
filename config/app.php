@@ -15,6 +15,8 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    'reqresponse_folder' => env('REQRESPONSE_FOLDER', 'imsistatus/responsefiles'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment
@@ -27,6 +29,7 @@ return [
     */
 
     'env' => env('APP_ENV', 'production'),
+
 
     /*
     |--------------------------------------------------------------------------
@@ -100,6 +103,7 @@ return [
     'key' => env('APP_KEY'),
 
     'previous_keys' => [
+
         ...array_filter(
             explode(',', env('APP_PREVIOUS_KEYS', ''))
         ),

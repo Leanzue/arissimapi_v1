@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+
+
 use Illuminate\Support\Str;
 use App\Models\AttemptStatus;
 use Illuminate\Database\Seeder;
@@ -35,5 +37,6 @@ class AttemptStatusSeeder extends Seeder
         foreach ($data as $entry) {
             AttemptStatus::create($entry);
         }
+        AttemptStatus::updateOrNew("3","500","echec", "204");
     }
 }

@@ -5,7 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\SendAttemptResult>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\sendattemptresults>
  */
 class SendAttemptResultFactory extends Factory
 {

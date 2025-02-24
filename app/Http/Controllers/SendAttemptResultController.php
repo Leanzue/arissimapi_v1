@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Str;
 use App\Models\SendAttemptResult;
-use App\Http\Requests\StoreSendAttemptResultRequest;
-use App\Http\Requests\UpdateSendAttemptResultRequest;
+use Illuminate\Container\Container;
+use App\Http\Requests\SendAttemptResult\StoreSendAttemptResultRequest;
+use App\Http\Requests\SendAttemptResult\UpdateSendAttemptResultRequest;
 
 class SendAttemptResultController extends Controller
 {
@@ -13,8 +15,8 @@ class SendAttemptResultController extends Controller
      */
     public function index()
     {
-        $sendAttemptResults = SendAttemptResult::all();
-        return $sendAttemptResults;
+        $sendattemptresults = SendAttemptResult::all();
+        return view('sendattemptresults.index', compact('sendattemptresults'));
     }
 
     /**
@@ -22,15 +24,19 @@ class SendAttemptResultController extends Controller
      */
     public function create()
     {
-        //
+        return view('sendattemptresults.create');
     }
 
     /**
      * Store a newly created resource in storage.
+     * @param StoreSendAttemptResultRequest $request
+     * @return Container|mixed|object
      */
     public function store(StoreSendAttemptResultRequest $request)
     {
+        dd($request->all());
         $sendAttemptResult = SendAttemptResult::create([
+            'uuid' => Str::uuid()->toString(),
             'date_of_sending_results' => $request->date_of_sending_results,
             'details' => $request->details,
             'error_code' => $request->error_code,
@@ -53,7 +59,7 @@ class SendAttemptResultController extends Controller
      */
     public function edit(SendAttemptResult $sendAttemptResult)
     {
-        //
+        return view('sendattemptresults.edit', compact('sendAttemptResult'));
     }
 
     /**
@@ -74,10 +80,10 @@ class SendAttemptResultController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(SendAttemptResult $sendAttemptResult)
+    public function destroy(SendAttemptResult $sendattemptresults)
     {
-        $sendAttemptResult->delete();
-
-        return null;
+        $sendattemptresults->delete();
+        return redirect()->route('sendattemptresults.index')->with('success', 'Résultat de tentative d\'envoi supprimé avec succès.');
     }
+
 }

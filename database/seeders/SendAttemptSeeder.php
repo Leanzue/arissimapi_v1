@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Support\Str;
 use App\Models\SendAttempt;
 use Illuminate\Database\Seeder;
+use App\Models\SendAttemptResult;
 
 class SendAttemptSeeder extends Seeder
 {
@@ -29,5 +30,6 @@ class SendAttemptSeeder extends Seeder
         foreach ($data as $entry) {
             SendAttempt::create($entry);
         }
+        SendAttempt::updateOrNew("Réponse créée avec succès","2025-01-15 10:30:00");
     }
 }

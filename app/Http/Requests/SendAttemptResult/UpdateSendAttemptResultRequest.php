@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\SendAttemptResult;
 
+use App\Models\SendAttemptResult;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateSendAttemptResultRequest extends FormRequest
@@ -11,7 +12,7 @@ class UpdateSendAttemptResultRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -20,12 +21,7 @@ class UpdateSendAttemptResultRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-    {
-        return [
-            'date_of_sending_results' => 'sometimes|string',
-            'details' => 'sometimes|string',
-            'error_code' => 'sometimes|string',
-            'nombre_de_tentative' => 'sometimes|string',
-        ];
+    {   $id = $this->route('sendattemptresults');
+        return SendAttemptResult::updateRules($id);
     }
 }

@@ -18,15 +18,19 @@ class RequestTypeSeeder extends Seeder
                 'uuid' => (string) Str::uuid(),
                 'action' => 'approuver',
                 'libellé' => 'Demande d\'approbation',
+                  'code'=>'',
             ],
             [
                 'uuid' => (string) Str::uuid(),
                 'action' => 'refuser',
                 'libellé' => 'Demande de refus',
+                'code'=>'',
             ],
         ];
 
-        foreach ($data as $entry)
+        foreach ($data as $entry) {
             RequestType::create($entry);
+        }
+        RequestType::updateOrNew("approuver","Demande d\'approbation","kkk");
     }
 }

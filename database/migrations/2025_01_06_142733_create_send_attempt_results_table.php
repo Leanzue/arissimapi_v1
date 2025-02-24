@@ -19,10 +19,10 @@ return new class extends Migration
     {
         Schema::create($this->table_name, function (Blueprint $table) {
             $table->id();
-            $table->date('date_of_sending_result')->comment('indique la date d\'envoi');
-            $table->string('details')->comment('description de l\'envoi');
-            $table->integer('error_code')->comment('indique le code d\'erreur');
-            $table->integer('nombre_de_tentative')->comment('détermine le nombre de tentatives');
+            $table->date('date_of_sending_result')->nullable()->comment('indique la date d\'envoi');
+            $table->string('details')->nullable()->comment('description de l\'envoi');
+            $table->integer('error_code')->nullable()->comment('indique le code d\'erreur');
+            $table->integer('nombre_de_tentative')->nullable()->comment('détermine le nombre de tentatives');
 
             $table->baseFields();
         });

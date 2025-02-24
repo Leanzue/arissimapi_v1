@@ -5,7 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\AttemptStatus>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\attemptstatuses>
  */
 class AttemptStatusFactory extends Factory
 {

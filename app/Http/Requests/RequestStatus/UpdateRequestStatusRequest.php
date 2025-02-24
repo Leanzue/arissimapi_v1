@@ -2,12 +2,13 @@
 
 namespace App\Http\Requests\RequestStatus;
 
+use App\Models\RequestStatus;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * @property mixed priority
+ * @property mixed $priority
  */
-class UpdateRequestStatusRequest extends FormRequest
+class UpdateRequestStatusRequest extends RequestStatusRequest
 {
     /**
      * @var mixed
@@ -19,7 +20,7 @@ class UpdateRequestStatusRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -28,10 +29,7 @@ class UpdateRequestStatusRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-    {
-        return [
-                 'priority' => 'sometimes|string',
-                 'libellé' => 'sometimes|string',
-        ];
+    {    $id = $this->route('requeststatuses');
+        return RequestStatus::updateRules($id);
     }
 }

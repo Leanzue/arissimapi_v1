@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
                 SimSeeder::class,
                 SimRequestSeeder::class,
                 AttemptStatusSeeder::class,
-                TreatementResultSeeder::class,
+                AttemptResultSeeder::class,
                 SendResultSeeder::class,
                 TreatementAttemptSeeder::class,
                 SendStatusSeeder::class,

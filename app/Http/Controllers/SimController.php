@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sim;
-use App\Http\Requests\StoreSimRequest;
-use App\Http\Requests\UpdateSimRequest;
+use Illuminate\Support\Str;
+use App\Http\Requests\Sim\StoreSimRequest;
+use App\Http\Requests\Sim\UpdateSimRequest;
 
 class SimController extends Controller
 {
@@ -14,7 +15,7 @@ class SimController extends Controller
     public function index()
     {
         $sims = Sim::all();
-        return $sims;
+        return view('sims.index', compact('sims'));
     }
 
     /**
@@ -22,7 +23,7 @@ class SimController extends Controller
      */
     public function create()
     {
-        //
+        return view('sims.create');
     }
 
     /**
@@ -31,6 +32,7 @@ class SimController extends Controller
     public function store(StoreSimRequest $request)
     {
         $sim = Sim::create([
+            'uuid' => Str::uuid()->toString(),
             'iccid' => $request->iccid,
             'imsi' => $request->imsi,
             'puk' => $request->puk,
@@ -53,7 +55,7 @@ class SimController extends Controller
      */
     public function edit(Sim $sim)
     {
-        //
+        return view('sims.edit', compact('sim'));
     }
 
     /**
@@ -75,10 +77,9 @@ class SimController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Sim $sim)
+    public function destroy(Sim $sims)
     {
-        $sim->delete();
-
-        return null;
+        $sims->delete();
+        return redirect()->route('sims.index')->with('success', ' Une Sim supprimée avec succès.');
     }
 }

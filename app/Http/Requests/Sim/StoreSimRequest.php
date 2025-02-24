@@ -1,31 +1,29 @@
 <?php
 
-namespace App\Http\Requests\SimRequest;
+namespace App\Http\Requests\Sim;
 
+use App\Models\Sim;
 use Illuminate\Foundation\Http\FormRequest;
+use \Illuminate\Contracts\Validation\ValidationRule;
 
-class StoreSimRequest extends FormRequest
+class StoreSimRequest extends simRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string,ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
-        return [
-            'iccid' => 'required|string',
-            'imsi' => 'required|string',
-            'puk' => 'required|string',
-            'pin' => 'required|string',
-        ];
+        return Sim::createRules();
+
     }
 }

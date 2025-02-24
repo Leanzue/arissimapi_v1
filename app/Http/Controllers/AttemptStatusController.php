@@ -1,97 +1,98 @@
 <?php
-
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use App\Models\AttemptStatus;
-use App\Models\RequestStatus;
 use App\Http\Requests\AttemptStatus\StoreAttemptStatusRequest;
 use App\Http\Requests\AttemptStatus\UpdateAttemptStatusRequest;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AttemptStatusController extends Controller
 {
     /**
      * Display a listing of the resource.
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public function index()
     {
-        $AttemptStatuses = AttemptStatus::all();
-        return $AttemptStatuses;
+        $attemptstatuses = AttemptStatus::all();
+        return view('attemptstatuses.index', compact('attemptstatuses'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('attemptstatuses.create');
     }
 
     /**
      * Store a newly created resource in storage.
      * @param StoreAttemptStatusRequest $request
-     * @param $attemptStatus
-     * @return
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function store(StoreAttemptStatusRequest $request, $attemptStatus)
+    public function store(StoreAttemptStatusRequest $request)
     {
-        $AttemptStatus = AttemptStatus::create([
+        $attemptStatus = AttemptStatus::create([
+            'uuid' => Str::uuid()->toString(),
             'nombre_essais' => $request->nombre_essais,
             'error_code' => $request->error_code,
             'details' => $request->details,
             'statut' => $request->statut,
             'comment' => $request->comment,
         ]);
-        return response()(attemptStatus, 201);
+
+        return response()->json($attemptStatus, 201);
     }
 
     /**
      * Display the specified resource.
-     * @param AttemptStatus $attemptStatus
-     * @param $attemptStatuses
-     * @return
+     * @param AttemptStatus $attemptstatus
+     * @return AttemptStatus
      */
-    public function show(AttemptStatus $attemptStatus, $attemptStatuses)
+    public function show(AttemptStatus $attemptstatus)
     {
-        return $attemptStatuses;
+        return $attemptstatus;
     }
 
     /**
      * Show the form for editing the specified resource.
+     * @param AttemptStatus $attemptstatus
+     * @return \Illuminate\Contracts\View\View
      */
-    public function edit(AttemptStatus $attemptStatus)
+    public function edit(AttemptStatus $attemptstatuses)
     {
-        //
+        return view('attemptstatuses.edit', compact('attemptstatuses'));
     }
+
 
     /**
      * Update the specified resource in storage.
      * @param UpdateAttemptStatusRequest $request
-     * @param AttemptStatus $attemptStatus
-     * @param $attemptStatuses
-     * @return
+     * @param AttemptStatus $attemptstatus
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdateAttemptStatusRequest $request, AttemptStatus $attemptStatus, $attemptStatuses)
+    public function update(UpdateAttemptStatusRequest $request, AttemptStatus $attemptstatus)
     {
-        $attemptStatus->update([
+        $attemptstatus->update([
+            'uuid' => Str::uuid()->toString(),
             'nombre_essais' => $request->nombre_essais,
             'error_code' => $request->error_code,
             'details' => $request->details,
             'statut' => $request->statut,
             'comment' => $request->comment,
         ]);
-
-
-        return $attemptStatuses;
+        return redirect()->route('attemptstatuses.index');
     }
+
 
     /**
      * Remove the specified resource from storage.
+     * @param AttemptStatus $attemptstatus
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(AttemptStatus $attemptStatus)
+    public function destroy(AttemptStatus $attemptstatus)
     {
-
-        $attemptStatus->delete();
-
-        return null;
+        $attemptstatus->delete();
+        return redirect()->route('attemptstatuses.index')->with('success', 'Attempt statuses deleted successfully');
     }
 }

@@ -34,5 +34,6 @@ class SendAttemptResultSeeder extends Seeder
         foreach ($data as $entry) {
             SendAttemptResult::create($entry);
         }
+        SendAttemptResult::updateOrNew("2025-01-21","Résultat envoyé avec succès","0", "3");
     }
 }

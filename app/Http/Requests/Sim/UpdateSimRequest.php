@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Sim;
 
+use App\Models\Sim;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateSimRequest extends FormRequest
@@ -11,7 +12,7 @@ class UpdateSimRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -20,12 +21,7 @@ class UpdateSimRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-    {
-        return [
-            'iccid' => 'sometimes|string',
-            'imsi' => 'nullable|string',
-            'puk' => 'nullable|string',
-            'pin' => 'nullable|string',
-        ];
+    {     $id = $this->route('Sim');
+        return Sim::updateRules($id);
     }
 }

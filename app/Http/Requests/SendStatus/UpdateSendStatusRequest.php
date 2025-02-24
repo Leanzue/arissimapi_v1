@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Requests\SendStatus;
-
+use App\Models\SendStatus;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateSendStatusRequest extends FormRequest
@@ -11,7 +11,7 @@ class UpdateSendStatusRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -20,12 +20,8 @@ class UpdateSendStatusRequest extends FormRequest
      * @param $request
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules($request): array
-    {
-        return [
-            'priority' => 'sometimes|string',
-            'libellé' => 'sometimes|string',
-
-        ];
+    public function rules(): array
+    {   $id = $this->route('sendstatuses');
+        return SendStatus::updateRules($id);
     }
 }

@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\SimRequest;
-use App\Http\Requests\StoreSimRequestRequest;
-use App\Http\Requests\UpdateSimRequestRequest;
+use Illuminate\Support\Str;
+use App\Http\Requests\SimRequest\StoreSimRequestRequest;
+use App\Http\Requests\SimRequest\UpdateSimRequestRequest;
 
 class SimRequestController extends Controller
 {
@@ -13,8 +14,8 @@ class SimRequestController extends Controller
      */
     public function index()
     {
-        $simRequests = SimRequest::all();
-        return $simRequests;
+        $simrequests = SimRequest::all();
+        return view('simrequests.index', compact('simrequests'));
     }
 
     /**
@@ -22,7 +23,7 @@ class SimRequestController extends Controller
      */
     public function create()
     {
-        //
+        return view('simRequests.create');
     }
 
     /**
@@ -31,9 +32,10 @@ class SimRequestController extends Controller
     public function store(StoreSimRequestRequest $request)
     {
         $simRequest = SimRequest::create([
+            'uuid' => Str::uuid()->toString(),
             'description' => $request->description,
-            'adresse' => $request->adresse,
-            'date' => $request->date,
+            'adresse_ip' => $request->adresse_ip,
+            'date'=>$request->date,
             'code' => $request->code,
         ]);
 
@@ -53,7 +55,7 @@ class SimRequestController extends Controller
      */
     public function edit(SimRequest $simRequest)
     {
-        //
+        return view('simRequests.edit', compact('simRequest'));
     }
 
     /**
@@ -63,7 +65,7 @@ class SimRequestController extends Controller
     {
         $simRequest->update([
             'description' => $request->description,
-            'adresse' => $request->adresse,
+            'adresse_ip' => $request->adresse_ip,
             'date' => $request->date,
             'code' => $request->code,
         ]);
@@ -74,10 +76,9 @@ class SimRequestController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(SimRequest $simRequest)
+    public function destroy(SimRequest $simrequests)
     {
-        $simRequest->delete();
-
-        return null;
+        $simrequests->delete();
+        return redirect()->route('simrequests.index')->with('success', ' une requete supprimée avec succès.');
     }
 }

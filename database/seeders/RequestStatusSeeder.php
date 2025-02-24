@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\SendStatus;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -19,19 +20,21 @@ class RequestStatusSeeder extends Seeder
             [
                 'uuid' => (string) Str::uuid(),
                 'priority' => '',
-                'libellé' => '',
+                'libelle' => '',
+                 'code'=>'',
 
             ],
             [
                 'uuid' => (string) Str::uuid(),
                 'priority' => '',
-                'libellé' => '',
-
+                'libelle' => '',
+                 'code'=>'',
             ],
         ];
 
         foreach ($data as $entry) {
             RequestStatus::create($entry);
         }
+        RequestStatus::updateOrNew('mm','ll',"kkk", 'mm');
     }
 }

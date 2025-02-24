@@ -1,0 +1,37 @@
+<?php
+
+namespace App\Console\Commands\SimRequest;
+
+use App\Models\SimRequest;
+use Illuminate\Console\Command;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\SimRequestResponseFilesImport;
+use function Symfony\Component\Routing\Loader\Configurator\import;
+
+class SimRequestImportResponseFile extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'simrequest:import-responsefile';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Command description';
+
+    /**
+     * Execute the console command.
+     */
+    public function handle()
+    {
+        $simrequest = SimRequest::getById(1);
+        //dd($simrequest->response_file_name);
+        $result = $simrequest->importFile();
+        dd($result);
+    }
+}

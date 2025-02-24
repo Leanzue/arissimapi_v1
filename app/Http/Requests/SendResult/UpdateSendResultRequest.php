@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\SendResult;
 
+use App\Models\SendResult;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateSendResultRequest extends FormRequest
@@ -11,7 +12,7 @@ class UpdateSendResultRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -20,12 +21,7 @@ class UpdateSendResultRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-    {
-        return [
-            'result_description' => 'sometimes|string',
-            'nombre_tentative' => 'sometimes|string',
-            'date_envoi' => 'sometimes|string',
-            'error_code' => 'sometimes|string',
-        ];
+    {   $id = $this->route('sendresults');
+        return SendResult::updateRules($id );
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\SimRequest;
 
+use App\Models\SimRequest;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateSimRequestRequest extends FormRequest
@@ -11,7 +12,7 @@ class UpdateSimRequestRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -19,13 +20,8 @@ class UpdateSimRequestRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+    public function rules($model): array
     {
-        return [
-            'description' => 'sometimes|string',
-            'adresse' => 'sometimes|string',
-            'date' => 'sometimes|string',
-            'code' => 'sometimes|string',
-        ];
+        return SimRequest::updateRules($this->route('simrequests'));
     }
 }

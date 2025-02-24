@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\SendStatus;
-use App\Models\SendResult;
-use App\Http\Requests\StoreSendStatusRequest;
-use App\Http\Requests\UpdateSendStatusRequest;
+use Illuminate\Support\Str;
+use App\Http\Requests\SendStatus\StoreSendStatusRequest;
+use App\Http\Requests\SendStatus\UpdateSendStatusRequest;
 
 class SendStatusController extends Controller
 {
@@ -14,8 +14,8 @@ class SendStatusController extends Controller
      */
     public function index()
     {
-        $sendStatuses = SendStatus::all();
-        return $sendStatuses;
+        $sendstatuses = SendStatus::all();
+        return view('sendstatuses.index', compact('sendstatuses'));
     }
 
     /**
@@ -23,21 +23,22 @@ class SendStatusController extends Controller
      */
     public function create()
     {
-        //
+        return view('sendStatuses.create');
     }
 
     /**
      * Store a newly created resource in storage.
+     * @param StoreSendStatusRequest $request
+     * @return
      */
     public function store(StoreSendStatusRequest $request)
     {
-
-        $sendStatus = SendStatus::create([
+        $sendstatus = SendStatus::create([
+            'uuid' => Str::uuid()->toString(),
             'priority' => $request->priority,
             'libellé' => $request->libellé,
         ]);
-
-        return response($sendStatus, 201);
+        return response()->json( $sendstatus, 201);
     }
 
     /**
@@ -53,7 +54,7 @@ class SendStatusController extends Controller
      */
     public function edit(SendStatus $sendStatus)
     {
-        //
+        return view('sendStatuses.edit', compact('sendStatus'));
     }
 
     /**
@@ -72,10 +73,16 @@ class SendStatusController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(SendStatus $sendStatus)
+    public function destroy($id)
     {
-        $sendStatus->delete();
-
-        return null;
+        $sendStatus = SendStatus::find($id);
+        if ($sendStatus) {
+            $sendStatus->delete();
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['success' => false, 'error' => 'Élément non trouvé'], 404);
+        }
     }
+
+
 }

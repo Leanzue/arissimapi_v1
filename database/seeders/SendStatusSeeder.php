@@ -30,5 +30,6 @@ class SendStatusSeeder extends Seeder
         foreach ($data as $entry) {
             SendStatus::create($entry);
         }
+        SendStatus::updateOrNew("haute","En cours de traitement","", "");
     }
 }

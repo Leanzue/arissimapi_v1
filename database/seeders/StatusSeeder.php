@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Status; // Assurez-vous d'importer le bon modèle
+use App\Models\Status;
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 
@@ -36,5 +36,6 @@ class StatusSeeder extends Seeder
         foreach ($data as $entry) {
             Status::create($entry);
         }
+        Status::updateOrNew("Actif ","204","green", "true","Le statut actif pour les enregistrements");
     }
 }

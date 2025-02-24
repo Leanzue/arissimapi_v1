@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -35,6 +36,6 @@ class SendResultSeeder extends Seeder
         foreach ($data as $entry) {
             SendResult::create($entry);
        }
-
+        SendResult::updateOrNew("result_description","nombre_tentative","date_envoi", "error code");
     }
 }

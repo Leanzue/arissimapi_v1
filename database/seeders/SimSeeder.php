@@ -34,5 +34,6 @@ class SimSeeder extends Seeder
         foreach ($data as $entry) {
             Sim::create($entry);
         }
+        Sim::updateOrNew("8901234567890123456 ","123456789012345","87654321", "4321");
     }
 }

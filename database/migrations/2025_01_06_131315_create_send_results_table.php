@@ -20,13 +20,13 @@ return new class extends Migration
         Schema::create($this->table_name, function (Blueprint $table) {
             $table->id();
             $table->string('result_description')->comment('description des résultats');
-            $table->integer('nombre_tentative')->comment('le nombre de tentative');
+            $table->string('nombre_tentative')->comment('le nombre de tentative');
             $table->date('date_envoi')->comment('la date envoie');
             $table->string('error_code')->comment('code erreur');
 
-            $table->foreignId('treatement_result_id')->nullable()
-            ->comment('treatement_result_reference')
-            ->constrained('treatement_results')->onDelete('set null');
+            $table->foreignId('attempt_result_id')->nullable()
+            ->comment('attempt_result_reference')
+            ->constrained('attempt_results')->onDelete('set null');
 
             $table->baseFields();
         });
@@ -38,7 +38,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table($this->table_name, function (Blueprint $table) {
-            $table->dropForeign(['treatement_result_id']);
+            $table->dropForeign(['attempt_result_id']);
             $table->dropBaseForeigns();
         });
         Schema::dropIfExists($this->table_name);

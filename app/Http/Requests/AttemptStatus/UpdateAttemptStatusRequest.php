@@ -5,14 +5,14 @@ namespace App\Http\Requests\AttemptStatus;
 use App\Models\AttemptStatus;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateAttemptStatusRequest extends FormRequest
+class UpdateAttemptStatusRequest extends AttemptStatusRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,13 +21,7 @@ class UpdateAttemptStatusRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-    {
-        return [
-            'nombre_essais' => 'sometimes|string',
-            'error_code' => 'sometimes|string',
-            'details' => 'sometimes|string',
-            'statut' => 'sometimes|string',
-            'comment' => 'nullable|string',
-        ];
+    {     $id = $this->route('attemptstatuses');
+        return  AttemptStatus::updateRules($id);
     }
 }

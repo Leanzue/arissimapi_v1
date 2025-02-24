@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\RequestType;
-use App\Models\RequestStatus;
-use App\Http\Requests\StoreRequestTypeRequest;
-use App\Http\Requests\UpdateRequestTypeRequest;
+use Illuminate\Support\Str;
+use App\Http\Requests\RequestType\StoreRequestTypeRequest;
+use App\Http\Requests\RequestType\UpdateRequestTypeRequest;
 
 class RequestTypeController extends Controller
 {
@@ -15,7 +15,7 @@ class RequestTypeController extends Controller
     public function index()
     {
         $requestTypes = RequestType::all();
-        return $requestTypes;
+        return view('requestTypes.index', compact('requestTypes'));;
     }
 
     /**
@@ -23,7 +23,7 @@ class RequestTypeController extends Controller
      */
     public function create()
     {
-        //
+        return view('requestTypes.create');
     }
 
     /**
@@ -32,44 +32,41 @@ class RequestTypeController extends Controller
     public function store(StoreRequestTypeRequest $request)
     {
         $requestType = RequestType::create([
-            'action' => $request->action,
-            'libellé' => $request->libellé,
+            'uuid' => Str::uuid()->toString(),
+            'action' => $request->input('action'),
+            'libellé' => $request->input('libellé'),
+            'status_id' => $request->input('status_id'),
         ]);
-        return response()($requestType, 201);
+        return response()->json($requestType, 201);
     }
 
     /**
      * Display the specified resource.
-     * @param RequestType $requestType
-     * @param $request
-     * @return
      */
-    public function show(RequestType $requestType, $request)
+    public function show(RequestType $requestType)
     {
         return $requestType;
     }
+
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(RequestType $requestType)
+    public function edit(RequestType $requestTypes)
     {
-        //
+        return view('requestTypes.edit', compact('requestTypes'));
     }
 
     /**
      * Update the specified resource in storage.
-     * @param UpdateRequestTypeRequest $request
-     * @param RequestType $requestType
-     * @param $requestTypes
-     * @return
      */
-    public function update(UpdateRequestTypeRequest $request, RequestType $requestType, $requestTypes)
+    public function update(UpdateRequestTypeRequest $request, RequestType $requestType)
     {
-        $requestType = RequestType::create([
-            'action' => $request->action,
-            'libellé' => $request->libellé,
+        $requestType->update([
+            'action' => $request->input('action'),
+            'libellé' => $request->input('libellé'),
+            'status_id' => $request->input('status_id'),
         ]);
-        return $requestTypes;
+        return response()->json($requestType, 200);
     }
 
     /**
@@ -78,7 +75,7 @@ class RequestTypeController extends Controller
     public function destroy(RequestType $requestType)
     {
         $requestType->delete();
-
-        return null;
+        return response()->json(['success' => true, 'message' => 'Un type de requête supprimé avec succès.']);
     }
+
 }

@@ -17,16 +17,20 @@ class SimRequestSeeder extends Seeder
             [
                 'uuid' => (string) Str::uuid(),
                 'description' => 'Demande de validation',
-                'adresse ip' => '192.168.1.1',
+                'adresse_ip' => '192.168.1.1',
                 'date' => '2025-01-21',
                 'code' => 'SIM2025001',
+                'file_prefix'=>'f866d0a0',
+                'file_extension'=>'csv',
             ],
             [
                 'uuid' => (string) Str::uuid(),
                 'description' => 'rejet de demande ',
-                'adresse ip' => '192.168.1.2',
+                'adresse_ip' => '192.168.1.2',
                 'date' => '2025-01-21',
                 'code' => 'SIM2025002',
+                'file_prefix'=>'9e4206fa',
+                'file_extension'=>'csv',
             ],
 
         ];
@@ -34,5 +38,6 @@ class SimRequestSeeder extends Seeder
         foreach ($data as $entry) {
             SimRequest::create($entry);
         }
+        SimRequest::updateOrNew("demande de validation ","192.168.1.1","2025-01-21", "sims 2025001","f866d0a0","csv");
     }
 }

@@ -16,8 +16,8 @@ return new class extends Migration
     {
         Schema::create($this->table_name, function (Blueprint $table) {
             $table->id();
-            $table->string('priority');
-            $table->string('libellé');
+            $table->string('priority')->nullable();
+            $table->string('libellé')->nullable();
 
             $table->baseFields();
 

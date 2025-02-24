@@ -1,17 +1,24 @@
 <?php
 
-namespace App\Http\Requests\TypeRequest;
+namespace App\Http\Requests\RequestType;
 
+use App\Models\RequestType;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @property mixed $Action
+ */
 class UpdateRequestTypeRequest extends FormRequest
 {
+    /**
+     * @var mixed
+     */
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -20,10 +27,7 @@ class UpdateRequestTypeRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-    {
-        return [
-            'action' => 'sometimes|string',
-            'libellé' => 'sometimes|string',
-        ];
+    {     $id = $this->route('requesttype');
+        return RequestType::updateRules($id);
     }
 }

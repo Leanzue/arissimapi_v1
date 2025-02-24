@@ -20,9 +20,11 @@ return new class extends Migration
         Schema::create($this->table_name, function (Blueprint $table) {
             $table->id();
             $table->string('description')->comment('description de la requête');
-            $table->string('adresse ip')->comment('adresse de la Sim');
-            $table->date('date')->comment('date de résolution de la requête');
+            $table->string('adresse_ip')->comment('adresse de la Sim');
+            $table->timestamp('date')->nullable()->comment('date de résolution de la requête');
             $table->string('code')->comment('genération du code requete');
+            $table->string('file_prefix')->nullable()->comment('file_prefix');
+            $table->string('file_extension')->nullable()->comment('file_extension');
 
             $table->foreignId('request_status_id')->nullable()
                 ->comment('request_status_reference')
@@ -33,7 +35,7 @@ return new class extends Migration
                 ->constrained('request_types')->onDelete('set null');
 
             $table->foreignId('sim_id')->nullable()
-                ->comment('sim reference')
+                ->comment('sims reference')
                 ->constrained('sims')->onDelete('set null');
 
             $table->baseFields();

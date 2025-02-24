@@ -17,22 +17,23 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create($this->table_name, function (Blueprint $table) {
-            $table->id();
-            $table->string('response_data')->nullable()->comment('les données de réponses');
-            $table->string('response_time')->comment('temps établi pour envoi de la réponse');
+        Schema::create($this->table_name,
+            function (Blueprint $table) {
+                $table->id();
+                $table->string('response_data')->nullable()->comment('les données de réponses');
+                $table->dateTime('response_time')->nullable()->comment('heure');
 
-            $table->foreignId('send_status_id')->nullable()
-            ->comment('send_status_reference')
-            ->constrained('send_statuses')->onDelete('set null');
+                $table->foreignId('send_status_id')->nullable()
+                    ->comment('send_status_reference')
+                    ->constrained('send_statuses')->onDelete('set null');
 
-            $table->foreignId('send_attempt_result_id')->nullable()
-            ->comment('send_attempt_result_reference')
-            ->constrained('send_attempt_results')->onDelete('set null');
+                $table->foreignId('send_attempt_result_id')->nullable()
+                    ->comment('send_attempt_result_reference')
+                    ->constrained('send_attempt_results')->onDelete('set null');
 
-            $table->baseFields();
+                $table->baseFields();
 
-        });
+            });
     }
 
     /**

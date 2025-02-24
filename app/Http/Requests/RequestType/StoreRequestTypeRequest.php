@@ -1,29 +1,32 @@
 <?php
 
-namespace App\Http\Requests\TypeRequest;
+namespace App\Http\Requests\RequestType;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Models\RequestType;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class StoreRequestTypeRequest extends FormRequest
+
+/**
+ * @method input(string $string)
+ * @method validated()
+ */
+class StoreRequestTypeRequest extends RequestTypeRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string,ValidationRule;ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
-        return [
-                'action' => 'required|string',
-                'libellé' => 'required|string',
-        ];
+              return RequestType::createRules();
     }
 }

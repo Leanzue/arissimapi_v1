@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Str;
 use App\Models\RequestStatus;
-use App\Http\Requests\StoreRequestStatusRequest;
-use App\Http\Requests\UpdateRequestStatusRequest;
+use App\Http\Requests\RequestStatus\StoreRequestStatusRequest;
+use App\Http\Requests\RequestStatus\UpdateRequestStatusRequest;
+
 
 class RequestStatusController extends Controller
 {
@@ -14,7 +16,7 @@ class RequestStatusController extends Controller
     public function index()
     {
         $requestStatuses = RequestStatus::all();
-        return $requestStatuses;
+        return view('requeststatuses.index', compact('requestStatuses'));;
     }
 
     /**
@@ -22,20 +24,23 @@ class RequestStatusController extends Controller
      */
     public function create()
     {
-
+        return view('requeststatuses.create');
     }
 
     /**
      * Store a newly created resource in storage.
+     * @param StoreRequestStatusRequest $request
+     * @return
      */
     public function store(StoreRequestStatusRequest $request)
     {
         $requestStatus = RequestStatus::create([
+            'uuid' => Str::uuid()->toString(),
             'priority' => $request->priority,
             'libellé' => $request->libellé,
         ]);
 
-        return response()(requestStatus, 201);
+        return response()->json($requestStatus, 201);
     }
 
     /**
@@ -54,7 +59,7 @@ class RequestStatusController extends Controller
      */
     public function edit(RequestStatus $requestStatus)
     {
-        //
+        return view('requeststatuses.edit', compact('requestStatus'));
     }
 
     /**
@@ -81,6 +86,7 @@ class RequestStatusController extends Controller
     public function destroy(RequestStatus $requestStatus)
     {
         $requestStatus->delete();
-        return null;
+        return redirect()->route('requeststatuses.index')->with('success', 'Statut de demande supprimé avec succès.');
     }
+
 }

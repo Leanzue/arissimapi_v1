@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\SendResult;
-use App\Http\Requests\StoreSendResultRequest;
-use App\Http\Requests\UpdateSendResultRequest;
+use Illuminate\Support\Str;
+use App\Http\Requests\SendResult\StoreSendResultRequest;
+use App\Http\Requests\SendResult\UpdateSendResultRequest;
 
 class SendResultController extends Controller
 {
@@ -13,8 +14,8 @@ class SendResultController extends Controller
      */
     public function index()
     {
-        $sendResults = SendResult::all();
-        return $sendResults;
+        $sendresults = SendResult::all();
+        return view('sendresults.index', compact('sendresults'));
     }
 
 
@@ -23,7 +24,7 @@ class SendResultController extends Controller
      */
     public function create()
     {
-        //
+        return view('sendResults.create');
     }
 
     /**
@@ -32,13 +33,14 @@ class SendResultController extends Controller
     public function store(StoreSendResultRequest $request)
     {
         $sendResult = SendResult::create([
+            'uuid' => Str::uuid()->toString(),
             'result_description' => $request->result_description,
             'nombre_tentative' => $request->nombre_tentative,
-            'date_envoi' => $request->date_envoi,
+            'date_envoi' => $request->date_envoi ?? now(),
             'error_code' => $request->error_code,
         ]);
 
-        return response()(sendResult, 201);
+        return response()->json($sendResult, 201);
     }
 
     /**
@@ -54,7 +56,7 @@ class SendResultController extends Controller
      */
     public function edit(SendResult $sendResult)
     {
-        //
+        return view('sendResults.edit', compact('sendResult'));
     }
 
     /**
@@ -77,7 +79,7 @@ class SendResultController extends Controller
     public function destroy(SendResult $sendResult)
     {
         $sendResult->delete();
-
-        return null;
+        return response()->json(['success' => true, 'message' => 'Résultat de tentative d\'envoi supprimé avec succès.']);
     }
+
 }
