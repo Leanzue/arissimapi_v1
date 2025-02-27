@@ -4,14 +4,14 @@
 namespace App\Contrats;
 
 
-use App\Models\SimRequest;
-use App\Models\AttemptResult;
+use App\Models\TreatmentAttempt\Treatment;
+use App\Models\TreatmentAttempt\TreatmentResult;
 
 interface ITreatmentService
 {
     /**
-     * @param SimRequest $simrequest
-     * @return AttemptResult
+     * @param Treatment $treatment
+     * @return TreatmentResult
      */
-    public function execTreatment($simrequest);
+    public function execTreatment($treatment): TreatmentResult;
 }

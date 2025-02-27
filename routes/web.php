@@ -8,21 +8,22 @@ use App\Http\Controllers\SendResultController;
 use App\Http\Controllers\SimRequestController;
 use App\Http\Controllers\SendAttemptController;
 use App\Http\Controllers\RequestTypeController;
-use App\Http\Controllers\AttemptStatusController;
+use App\Http\Controllers\TreatmentStatusController;
 use App\Http\Controllers\RequestStatusController;
-use App\Http\Controllers\AttemptResultController;
-use App\Http\Controllers\SendAttemptResultController;
+use App\Http\Controllers\TreatmentResultController;
+use App\Http\Controllers\SendTreatmentResultController;
 use App\Http\Controllers\TreatmentAttemptController;
 
-Route::get('/', function () {
-    return view('welcome');
-    Route::resource('requestedsims', SimController::class)->names('sims');
-    Route::resource('requestedsims', SimController::class)->names('sims');
-    Route::resource('requestedsims', SimController::class)->names('sims');
-    Route::resource('requestedsims', SimController::class)->names('sims');
-    Route::resource('requestedsims', SimController::class)->names('sims');
-    Route::resource('simrequests', SimRequestController::class);
-    Route::resource('statuses', StatusController::class);
-    Route::resource('treatmentattempts', TreatmentAttemptController::class);
-    Route::resource('attemptresults', AttemptResultController::class);
+Route::prefix('api')->group(function () {
+  Route::resource('treatmentresults', TreatmentResultController::class);
+  Route::resource('requested', SimController::class)->names('sims');
+  Route::resource('simrequests', SimRequestController::class);
+  Route::resource('statuses', StatusController::class);
+  Route::resource('treatmentattempts', TreatmentAttemptController::class);
+  Route::resource('treatmentresults', TreatmentResultController::class);
+  Route::resource('treatmentstatuses', TreatmentStatusController::class);
+  Route::resource('treatmentstatuses', TreatmentStatusController::class);
+  Route::resource('treatmentstatuses', TreatmentStatusController::class);
+  Route::resource('treatmentstatuses', TreatmentStatusController::class);
+
 });

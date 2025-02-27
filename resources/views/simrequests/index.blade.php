@@ -22,11 +22,11 @@
         <thead>
         <tr>
             <th>ID</th>
-            <th>Description</th>
-            <th>Adresse IP</th>
-            <th>Date</th>
             <th>Code</th>
-            <th>Actions</th>
+            <th>client_IP_Adresse</th>
+            <th>Url_reponse</th>
+            <th>file_prefix</th>
+            <th>file_extension</th>
         </tr>
         </thead>
         <tbody>

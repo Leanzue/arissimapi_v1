@@ -2,7 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Sim;
+
+use App\Models\Sim\Sim;
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 
@@ -13,27 +14,6 @@ class SimSeeder extends Seeder
      */
     public function run(): void
     {
-        $data = [
-            [
-                'uuid' => (string) Str::uuid(),
-                'iccid' => '8901234567890123456',
-                'imsi' => '123456789012345',
-                'puk' => '12345678',
-                'pin' => '1234',
-            ],
-            [
-                'uuid' => (string) Str::uuid(),
-                'iccid' => '8901234567890123457',
-                'imsi' => '123456789012346',
-                'puk' => '87654321',
-                'pin' => '4321',
-            ],
-
-        ];
-
-        foreach ($data as $entry) {
-            Sim::create($entry);
-        }
         Sim::updateOrNew("8901234567890123456 ","123456789012345","87654321", "4321");
     }
 }

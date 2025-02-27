@@ -2,11 +2,13 @@
 
 namespace Database\Seeders;
 
-use App\Models\SendStatus;
+
+use App\Models\SimRequest\RequestStatus;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
-use App\Models\RequestStatus;
+
+
 
 class RequestStatusSeeder extends Seeder
 {
@@ -15,26 +17,10 @@ class RequestStatusSeeder extends Seeder
      */
     public function run(): void
     {
-
-        $data = [
-            [
-                'uuid' => (string) Str::uuid(),
-                'priority' => '',
-                'libelle' => '',
-                 'code'=>'',
-
-            ],
-            [
-                'uuid' => (string) Str::uuid(),
-                'priority' => '',
-                'libelle' => '',
-                 'code'=>'',
-            ],
-        ];
-
-        foreach ($data as $entry) {
-            RequestStatus::create($entry);
-        }
-        RequestStatus::updateOrNew('mm','ll',"kkk", 'mm');
+        RequestStatus::updateOrNew("waiting", "En Attente","-1",-1);
+        RequestStatus::updateOrNew("running", "En Cours","2",2);
+        RequestStatus::updateOrNew("ended", "Terminé","1",1);
+        RequestStatus::updateOrNew("suspended", "Suspendu","0",0);
     }
+
 }

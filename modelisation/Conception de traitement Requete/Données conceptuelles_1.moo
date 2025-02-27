@@ -3336,7 +3336,7 @@ DAT 1735828181</a:History>
 <c:Attributes>
 <o:Attribute Id="o112">
 <a:ObjectID>268ACB9E-F555-46E4-BC21-DF9678ADA6EE</a:ObjectID>
-<a:Name>IDsendattemptresult</a:Name>
+<a:Name>IDsendtreatmentresult</a:Name>
 <a:Code>IDSENDATTEMPTRESULT</a:Code>
 <a:CreationDate>1735828181</a:CreationDate>
 <a:Creator>g.nzue-ext</a:Creator>

@@ -6275,7 +6275,7 @@ DAT 1735817195</a:History>
 </o:Column>
 <o:Column Id="o130">
 <a:ObjectID>00B49FAF-B130-4B38-B2FC-7BD3FC6267F5</a:ObjectID>
-<a:Name>IDsendattemptresult</a:Name>
+<a:Name>IDsendtreatmentresult</a:Name>
 <a:Code>IDSENDATTEMPTRESULT</a:Code>
 <a:CreationDate>1735817194</a:CreationDate>
 <a:Creator>g.nzue-ext</a:Creator>
@@ -6634,7 +6634,7 @@ DAT 1735817195</a:History>
 <c:Columns>
 <o:Column Id="o154">
 <a:ObjectID>E5B83D30-940E-4367-8FC0-10164911EF6F</a:ObjectID>
-<a:Name>IDsendattemptresult</a:Name>
+<a:Name>IDsendtreatmentresult</a:Name>
 <a:Code>IDSENDATTEMPTRESULT</a:Code>
 <a:CreationDate>1735817194</a:CreationDate>
 <a:Creator>g.nzue-ext</a:Creator>

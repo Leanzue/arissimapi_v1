@@ -19,6 +19,7 @@ return new class extends Migration
     {
         Schema::create($this->table_name, function (Blueprint $table) {
             $table->id();
+
             $table->string('iccid')->nullable()->comment('les données de réponses');
             $table->string('status')->nullable()->comment('les données de réponses');
             $table->string('status_change_date_str')->nullable()->comment('les données de réponses');

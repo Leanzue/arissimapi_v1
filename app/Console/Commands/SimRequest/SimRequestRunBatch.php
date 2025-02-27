@@ -3,11 +3,8 @@
 namespace App\Console\Commands\SimRequest;
 
 use Illuminate\Console\Command;
-use App\Models\SimRequest;
+use App\Models\SimRequest\SimRequest;
 
-/**
- * @method runBatch(SimRequest $waiting_request)
- */
 class SimRequestRunBatch extends Command
 {
 

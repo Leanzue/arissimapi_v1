@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
-use App\Models\RequestType;
+use App\Models\SimRequest\RequestType;
 
 class RequestTypeSeeder extends Seeder
 {
@@ -13,24 +13,9 @@ class RequestTypeSeeder extends Seeder
      */
     public function run(): void
     {
-        $data = [
-            [
-                'uuid' => (string) Str::uuid(),
-                'action' => 'approuver',
-                'libellé' => 'Demande d\'approbation',
-                  'code'=>'',
-            ],
-            [
-                'uuid' => (string) Str::uuid(),
-                'action' => 'refuser',
-                'libellé' => 'Demande de refus',
-                'code'=>'',
-            ],
-        ];
-
-        foreach ($data as $entry) {
-            RequestType::create($entry);
-        }
-        RequestType::updateOrNew("approuver","Demande d\'approbation","kkk");
+        RequestType::updateOrNew("demande_statut", "Demande de Statut","Demande de Statut")->setDefault();
+        //RequestType::updateOrNew("running", "En Cours","En Cours");
+        //RequestType::updateOrNew("ended", "Terminé","Terminé");
+        //RequestType::updateOrNew("suspended", "Suspendu","Suspendu");
     }
 }

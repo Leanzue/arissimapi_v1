@@ -2,11 +2,11 @@
 
 namespace App\Imports;
 
-use App\Models\SimRequest;
-use App\Models\SimRequestResponseFile;
+use App\Models\SimRequest\SimRequest;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use App\Models\SimRequest\SimRequestResponseFile;
 
 class SimRequestResponseFilesImport implements ToModel, WithHeadingRow, WithStartRow
 {

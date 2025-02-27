@@ -3152,7 +3152,7 @@ DAT 1735890659</a:History>
 </o:EntityAttribute>
 <o:EntityAttribute Id="o113">
 <a:ObjectID>7F0A7FD0-2C67-4266-BAFA-06399C5699B0</a:ObjectID>
-<a:Name>IDsendattemptresult</a:Name>
+<a:Name>IDsendtreatmentresult</a:Name>
 <a:Code>IDSENDATTEMPTRESULT</a:Code>
 <a:CreationDate>1735890659</a:CreationDate>
 <a:Creator>g.nzue-ext</a:Creator>
@@ -3381,7 +3381,7 @@ DAT 1735890659</a:History>
 <c:Attributes>
 <o:EntityAttribute Id="o128">
 <a:ObjectID>03D0C854-F852-481E-9CC3-94FC8DAF2BB0</a:ObjectID>
-<a:Name>IDsendattemptresult</a:Name>
+<a:Name>IDsendtreatmentresult</a:Name>
 <a:Code>IDSENDATTEMPTRESULT</a:Code>
 <a:CreationDate>1735890659</a:CreationDate>
 <a:Creator>g.nzue-ext</a:Creator>

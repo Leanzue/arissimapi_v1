@@ -12,7 +12,7 @@
     </nav>
 </header>
 <main>
-    <h1>Create New AttemptStatus</h1>
+    <h1>Create New TreatmentStatus</h1>
     <form action="{{route('attemptstatuses.store')}}" method="POST">
         @csrf
         <div>

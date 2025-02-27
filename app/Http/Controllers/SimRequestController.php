@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SimRequest;
 use Illuminate\Support\Str;
+use App\Models\SimRequest\SimRequest;
 use App\Http\Requests\SimRequest\StoreSimRequestRequest;
 use App\Http\Requests\SimRequest\UpdateSimRequestRequest;
 

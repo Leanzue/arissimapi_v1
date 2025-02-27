@@ -15,19 +15,23 @@
         @csrf
         @method('PUT')
         <div class="form-group">
-            <label for="description">Description</label>
+            <label for="description">Code</label>
             <input type="text" class="form-control" id="description" name="description" value="{{ $simRequest->description }}" required>
         </div>
         <div class="form-group">
-            <label for="adresse_ip">Adresse IP</label>
+            <label for="adresse_ip">client_IP_Adresse</label>
             <input type="text" class="form-control" id="adresse_ip" name="adresse_ip" value="{{ $simRequest->adresse_ip }}" required>
         </div>
         <div class="form-group">
-            <label for="date">Date</label>
+            <label for="date">Url_reponse</label>
             <input type="text" class="form-control" id="date" name="date" value="{{ $simRequest->date }}" required>
         </div>
         <div class="form-group">
-            <label for="code">Code</label>
+            <label for="code">file_prefix</label>
+            <input type="text" class="form-control" id="code" name="code" value="{{ $simRequest->code }}" required>
+        </div>
+        <div class="form-group">
+            <label for="code">file_extension</label>
             <input type="text" class="form-control" id="code" name="code" value="{{ $simRequest->code }}" required>
         </div>
         <button type="submit" class="btn btn-primary">Modifier</button>

@@ -4426,7 +4426,7 @@ LABL 0 Arial,8,N</a:FontList>
 </o:DataItem>
 <o:DataItem Id="o233">
 <a:ObjectID>E9C6C869-6554-44DD-873A-D371EFE0F838</a:ObjectID>
-<a:Name>IDsendattemptresult</a:Name>
+<a:Name>IDsendtreatmentresult</a:Name>
 <a:Code>IDSENDATTEMPTRESULT</a:Code>
 <a:CreationDate>1735568746</a:CreationDate>
 <a:Creator>g.nzue-ext</a:Creator>

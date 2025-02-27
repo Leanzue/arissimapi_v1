@@ -3927,7 +3927,7 @@ DAT 1735815888</a:History>
 </o:Column>
 <o:Column Id="o131">
 <a:ObjectID>660A002F-36FF-4BF8-A537-E5E5ED2546E2</a:ObjectID>
-<a:Name>IDsendattemptresult</a:Name>
+<a:Name>IDsendtreatmentresult</a:Name>
 <a:Code>IDSENDATTEMPTRESULT</a:Code>
 <a:CreationDate>1735818742</a:CreationDate>
 <a:Creator>g.nzue-ext</a:Creator>
@@ -4305,7 +4305,7 @@ DAT 1735815888</a:History>
 <c:Columns>
 <o:Column Id="o154">
 <a:ObjectID>35731FE8-5D77-434B-A980-75184E4C7989</a:ObjectID>
-<a:Name>IDsendattemptresult</a:Name>
+<a:Name>IDsendtreatmentresult</a:Name>
 <a:Code>IDSENDATTEMPTRESULT</a:Code>
 <a:CreationDate>1735818742</a:CreationDate>
 <a:Creator>g.nzue-ext</a:Creator>

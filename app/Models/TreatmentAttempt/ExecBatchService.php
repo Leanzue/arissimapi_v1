@@ -3,12 +3,9 @@
 
 namespace App\Models\TreatmentAttempt;
 
-
-use App\Models\SimRequest;
-use App\Models\AttemptResult;
 use App\Contrats\ITreatmentService;
+use App\Models\SimRequest\SimRequest;
 use Illuminate\Support\Facades\Process;
-use function Carbon\this;
 
 class ExecBatchService implements ITreatmentService
 {
@@ -17,42 +14,67 @@ class ExecBatchService implements ITreatmentService
      */
     public $simrequest;
 
+    /**
+     * @var Treatment
+     */
+    public $treatment;
+
+    /**
+     * @var TreatmentResult
+     */
+    public $treatmentresult;
+
     public static $BATCH_FOLDER = "C:\\xampp\\htdocs\\arissimapi\\imsistatus";
     public static $BATCH_NAME = "execsqlaris.bat";
     public static $BATCH_DELAY_SECONDS = 5;
 
     /**
-     * @param SimRequest $simrequest
-     * @return AttemptResult|void
+     * @param Treatment $treatment
+     * @return TreatmentResult
      */
-    public function execTreatment($simrequest)
+    public function execTreatment($treatment): TreatmentResult
     {
-        $this->simrequest = $simrequest;
+        $this->simrequest = $treatment->treatmentattempt->simrequest;
+        $this->treatment = $treatment;
+        $this->treatmentresult = TreatmentResult::createNewResult($treatment, $this->simrequest, "Execution Batch");
+
         // Start Attempt
         //$result = exec('start ' . self::$BATCH_FOLDER . "\\" . self::$BATCH_NAME . " " . $this->sim->iccid . " " . $this->file_prefix . " " . $this->file_extension);
 
-        $result = Process::run('start ' . self::$BATCH_FOLDER . "\\" . self::$BATCH_NAME . " " . $this->simrequest->sim->iccid . " " . $simrequest->file_prefix . " " . $simrequest->file_extension);
-        // wait for delay
-        sleep(self::$BATCH_DELAY_SECONDS);
+        if ($this->checkInputs()) {
+            $result = Process::run('start ' . self::$BATCH_FOLDER . "\\" . self::$BATCH_NAME . " " . $this->simrequest->sim ->iccid . " " . $this->simrequest->file_prefix . " " . $this->simrequest->file_extension);
+            // wait for delay
+            sleep(self::$BATCH_DELAY_SECONDS);
 
-        // Try Parse Batch Response File
+            // succes
+            $this->treatmentresult->setSuccess();
+        }
 
-        $this->tryParseBatchResponseFile();
-
-        //Envoyer la
-
-        // $this->sendBatchCompletedNotification();
-        // End Attempt
+        return $this->treatmentresult;
     }
 
-    public function tryParseBatchResponseFile()
-    {
-        //dd($this->response_file_name, $this->isBatchResponseFileExists());
-        // check existance fichier
-        if (!$this->simrequest->isBatchResponseFileExists()) {
-            $this->simrequest->setWaitingParse();
-            return;
+    private function checkInputs() {
+
+        if (! $this->simrequest->sim) {
+            $this->treatmentresult->setFailed("Sim non renseigne");
+            return false;
         }
-        // le fichier existe
+
+        if (! $this->simrequest->sim->iccid) {
+            $this->treatmentresult->setFailed("ICCID non renseigne");
+            return false;
+        }
+
+        if (! $this->simrequest->file_prefix) {
+            $this->treatmentresult->setFailed("PREFIX fichier non renseigne");
+            return false;
+        }
+
+        if (! $this->simrequest->file_extension) {
+            $this->treatmentresult->setFailed("EXTENSION fichier non renseigne");
+            return false;
+        }
+
+        return true;
     }
 }

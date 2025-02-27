@@ -19,9 +19,9 @@ return new class extends Migration
     {
         Schema::create($this->table_name, function (Blueprint $table) {
         $table->id();
-        $table ->string('priority')->comment('détermine la priorité');
-         $table->string('libelle')->comment('determine le statut');
          $table->string('code')->comment('code du statut ');
+         $table->string('libelle')->comment('determine le statut');
+        $table ->integer('priority')->default(0)->comment('détermine la priorité');
          $table->string('description')->comment('description');
 
             $table->baseFields();
