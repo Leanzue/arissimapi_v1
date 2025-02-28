@@ -26,6 +26,11 @@ class ImportFileServie implements ITreatmentService
      */
     public $treatmentresult;
 
+    public static function getQueueName()
+    {
+        return "importfileservie";
+    }
+
     /**
      * @param Treatment $treatment
      * @return TreatmentResult
