@@ -23,16 +23,15 @@ class TreatmentDispatchedListener
     public function handle(TreatmentDispatchedEvent $event): void
     {
         Log::info("TreatmentDispatchedListener: " . get_class($event->hastreatment));
-        $event->hastreatment;
 
         $event->hastreatment->setQueueing();
 
         if ( get_class($event->hastreatment) === Treatment::class ) {
             // Cas de Treatment
-            TreatmentDispatchedEvent::dispatch($event->hastreatment->treatmentattempt);
+            $event->hastreatment->treatmentattempt->subTreatmentDispatched($event->hastreatment);
         } elseif ( get_class($event->hastreatment) === TreatmentAttempt::class ) {
             // Cas de TreatmentAttempt
-            $event->hastreatment->simrequest->setQueueing();
+            $event->hastreatment->simrequest->subTreatmentDispatched($event->hastreatment);
         }
     }
 }

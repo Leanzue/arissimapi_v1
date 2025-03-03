@@ -7,7 +7,9 @@ use Illuminate\Support\Carbon;
 use App\Contrats\IHasTreatment;
 use App\Contrats\ITreatmentService;
 use App\Jobs\Treatment\TreatmentJob;
+use App\Events\TreatmentFailedEvent;
 use App\Contrats\IHasTreatmentResult;
+use App\Events\TreatmentSucceedEvent;
 use App\Traits\TreatmentAttempt\HasTreatment;
 use App\Traits\TreatmentAttempt\HasTreatmentResult;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,7 +26,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property Carbon $date_fin
  * @property string $description
  *
- * @property TreatmentAttempt|null $treatmentattempt
  */
 class Treatment extends BaseModel implements IHasTreatmentResult, IHasTreatment
 {
@@ -158,12 +159,14 @@ class Treatment extends BaseModel implements IHasTreatmentResult, IHasTreatment
         } elseif ($result->resultat === 1) {
             // succes traitement
             $this->setSuccess();
-            $this->treatmentattempt->setWaiting();
+           // $this->treatmentattempt->setWaiting();
+            TreatmentSucceedEvent::dispatch($this);
         } elseif ($result->resultat === -1) {
             // échec traitement
-            $this->setFailed();
+            //$this->setFailed();
             // echec tentative
-            $this->treatmentattempt->setFailed();
+           // $this->treatmentattempt->setFailed();
+            TreatmentFailedEvent::dispatch($this);
         } elseif ($result->resultat === 2) {
             // traitement suspendu
             $this->setSuspended();
@@ -183,5 +186,20 @@ class Treatment extends BaseModel implements IHasTreatmentResult, IHasTreatment
      */
     public static function getById($id) {
         return Treatment::find($id);
+    }
+
+    public function subTreatmentDispatched($subtreatment)
+    {
+        // TODO: Implement subTreatmentDispatched() method.
+    }
+
+    public function subTreatmentFailed($subtreatment)
+    {
+        // TODO: Implement subTreatmentFailed() method.
+    }
+
+    public function subTreatmentSucceed($subtreatment)
+    {
+        // TODO: Implement subTreatmentSucceed() method.
     }
 }

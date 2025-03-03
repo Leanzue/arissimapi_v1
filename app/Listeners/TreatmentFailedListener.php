@@ -22,20 +22,19 @@ class TreatmentFailedListener
 
     /**
      * Handle the event.
+     * @param TreatmentFailedEvent $event
      */
     public function handle(TreatmentFailedEvent $event): void
     {
         Log::info("TreatmentFailedListener: " . get_class($event->hastreatment));
-        $event->hastreatment;
-
         $event->hastreatment->setFailed();
 
         if ( get_class($event->hastreatment) === Treatment::class ) {
             // Cas de Treatment
-            TreatmentFailedEvent::dispatch($event->hastreatment->treatmentattempt);
+            $event->hastreatment->treatmentattempt->subTreatmentFailed($event->hastreatment);
         } elseif ( get_class($event->hastreatment) === TreatmentAttempt::class ) {
             // Cas de TreatmentAttempt
-            $event->hastreatment->simrequest->setFailed();
+            $event->hastreatment->simrequest->subTreatmentFailed($event->hastreatment);
         }
     }
 }

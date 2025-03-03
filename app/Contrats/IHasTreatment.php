@@ -3,9 +3,21 @@
 
 namespace App\Contrats;
 
+use App\Models\SimRequest\SimRequest;
+use App\Models\TreatmentAttempt\TreatmentAttempt;
 
+/**
+ * Interface IHasTreatment
+ * @package App\Contrats
+ *
+ * @property TreatmentAttempt|null $treatmentattempt
+ * @property SimRequest|null $simrequest
+ *
+ * @method treatmentresults(): morphMany
+ */
 interface IHasTreatment
 {
+    //
     public function treatmentstatus();
     #region Treatment Status Management
     public function setStart();
@@ -30,4 +42,20 @@ interface IHasTreatment
     public function isMaxFailed();
     public function isSuspended();
     public function isMaxSuspended();
+
+    //
+    /**
+     * @param IHasTreatment $subtreatment
+     */
+    public function subTreatmentDispatched($subtreatment);
+
+    /**
+     * @param IHasTreatment $subtreatment
+     */
+    public function subTreatmentFailed($subtreatment);
+
+    /**
+     * @param IHasTreatment $subtreatment
+     */
+    public function subTreatmentSucceed($subtreatment);
 }

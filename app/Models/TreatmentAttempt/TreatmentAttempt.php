@@ -6,9 +6,11 @@ use App\Models\User;
 use App\Models\BaseModel;
 use Illuminate\Support\Carbon;
 use App\Contrats\IHasTreatment;
-use Illuminate\Support\Facades\Log;
 use App\Models\SimRequest\SimRequest;
+use App\Events\TreatmentSucceedEvent;
+use App\Events\TreatmentDispatchedEvent;
 use App\Traits\TreatmentAttempt\HasTreatment;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
@@ -32,7 +34,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  *
  * @method static TreatmentAttempt create(array $array)
  *
- * @property SimRequest|null $simrequest
  * @property Treatment[] $treatments
  * @property Treatment $latesttreatment
  */
@@ -75,6 +76,9 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
         return $this->belongsTo(SimRequest::class, "sim_request_id");
     }
 
+    /**
+     * @return HasMany
+     */
     public function treatments()
     {
         return $this->hasMany(Treatment::class, "treatment_attempt_id");
@@ -170,44 +174,20 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
     {
         if (count($this->treatments) === 0) {
             // Aucun traitement
-            $treatment = $this->createNewExecBatch();
-            $treatment->dispatchTreatment();
+            $this->getNextTreatment()->dispatchTreatment();
 
-            //$this->setWaiting();
             return;
         }
 
         // -> si le dernier traitement est un success,
         if ($this->latesttreatment->isSuccess()) {
-            // on passe au suivant
-            $treatment = $this->createNextTreatment();
-            // s'il n y a pas de traitement suivant,
-            if (is_null($treatment)) {
-                // marquer la tentative comme success
-                $this->setSuccess();
-                // et marquer la requete comme success
-                $this->simrequest->setSuccess();
-            } else {
-                // sinon, on l'execute
-                $treatment->dispatchTreatment();
-                $this->setWaiting();
-            }
+            $this->subTreatmentSucceed($this->latesttreatment);
             return;
         }
 
         // -> si le dernier est un echec,
         if ($this->latesttreatment->isFailed()) {
-            //-> re-tenter si le nombre max de tentatives est atteint
-            if ($this->latesttreatment->treatmentresults()->count() >= self::$MAX_TREATMENT_FAILED_RETRY) {
-                // -> marquer la tentative comme Max-Failed (Echec de la tentative)
-                $this->setMaxFailed();
-                //marquer la requete comme failed
-                $this->simrequest->setFailed();
-            } else {
-                // -> sinon Reessayer a nouveau
-                $this->setWaiting();
-                $this->latesttreatment->dispatchTreatment();
-            }
+            $this->subTreatmentFailed($this->latesttreatment);
             return;
         }
 
@@ -243,6 +223,49 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
     }
 
     /**
+     * @param IHasTreatment $subtreatment
+     */
+    public function subTreatmentDispatched($subtreatment) {
+        TreatmentDispatchedEvent::dispatch($this);
+    }
+
+    /**
+     * @param IHasTreatment $subtreatment
+     */
+    public function subTreatmentFailed($subtreatment) {
+        //-> re-tenter si le nombre max de tentatives est atteint
+        if ($subtreatment->treatmentresults()->count() >= self::$MAX_TREATMENT_FAILED_RETRY) {
+            // -> marquer la tentative comme Max-Failed (Echec de la tentative)
+            $this->setMaxFailed();
+            //marquer la requete comme failed
+            $this->simrequest->subTreatmentFailed($this);
+        } else {
+            // -> sinon Reessayer a nouveau
+            // $this->setWaiting();
+            $subtreatment->dispatchTreatment();
+        }
+    }
+
+    /**
+     * @param IHasTreatment $subtreatment
+     */
+    public function subTreatmentSucceed($subtreatment) {
+        // on passe au suivant
+        $treatment = $this->getNextTreatment();
+        // s'il n y a pas de traitement suivant,
+        if (is_null($treatment)) {
+            // marquer la tentative comme success
+            $this->setSuccess();
+            // et marquer la requete comme success
+            TreatmentSucceedEvent::dispatch($this);
+        } else {
+            // sinon, on l'execute
+            $treatment->dispatchTreatment();
+            //$this->setWaiting();
+        }
+    }
+
+    /**
      * @return Treatment
      */
     private function createNewExecBatch()
@@ -271,16 +294,32 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
     }
 
     /**
+     * @param int $posi
      * @return Treatment|null
      */
-    private
-    function createNextTreatment()
+    private function getNextTreatment($posi = -1)
     {
-        if ($this->latesttreatment->service_class === ExecBatchService::class) {
+        if ( $posi === -1 ) {
+            $posi = $this->treatments()->count() + 1;
+        }
+
+        switch ($posi) {
+            case 1:
+                return $this->createNewExecBatch();
+                break;
+            case 2:
+                return $this->createNewImportFile();
+                break;
+            case 3:
+                return $this->createSendResponse();
+                break;
+        }
+
+        /*if ($this->latesttreatment->service_class === ExecBatchService::class) {
             return $this->createNewImportFile();
         } elseif ($this->latesttreatment->service_class === ImportFileService::class) {
             return $this->createSendResponse();
-        }
+        }*/
         return null;
     }
     #endregion

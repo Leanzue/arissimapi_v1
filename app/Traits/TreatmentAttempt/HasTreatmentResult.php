@@ -15,7 +15,7 @@ use App\Models\TreatmentAttempt\TreatmentResult;
 trait HasTreatmentResult
 {
     /**
-     * Renvoie les e-mails (Adresseemail) de ce model.
+     * Renvoie les TreatmentResult de ce model.
      */
     public function treatmentresults()
     {

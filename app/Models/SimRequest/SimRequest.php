@@ -5,6 +5,7 @@ namespace App\Models\SimRequest;
 use App\Models\Sim\Sim;
 use App\Models\BaseModel;
 use App\Traits\Code\HasCode;
+use App\Contrats\IHasTreatment;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
 use App\Models\TreatmentAttempt\Treatment;
@@ -307,22 +308,43 @@ class SimRequest extends BaseModel
 
         // si la derniere tentative a reussi
         if ($this->latesttreatmentattempt->isSuccess()) {
-            // Marquer la requete comme success
-            $this->setSuccess();
+            $this->subTreatmentSucceed($this->latesttreatmentattempt);
             return;
         }
 
         // si la derniere tentative a échoué
         if ($this->latesttreatmentattempt->isFailed()) {
-            //-> ressayer si le nombre maximal de tentative est atteint
-            if ($this->treatmentattempts()->count() >= self::$MAX_ATTEMPTS_FAILED_RETRY ) {
-                // Marquer le requete comme failed
-                $this->setMaxFailed();
-            } else {
-                // sinon, Reessayer
-                $this->startNewAttempt();
-            }
+            $this->subTreatmentFailed($this->latesttreatmentattempt);
         }
+    }
+
+    /**
+     * @param IHasTreatment $subtreatment
+     */
+    public function subTreatmentDispatched($subtreatment) {
+        $this->setQueueing();
+    }
+
+    /**
+     * @param IHasTreatment $subtreatment
+     */
+    public function subTreatmentFailed($subtreatment) {
+        //-> ressayer si le nombre maximal de tentative est atteint
+        if ($this->treatmentattempts()->count() >= self::$MAX_ATTEMPTS_FAILED_RETRY ) {
+            // Marquer le requete comme failed
+            $this->setMaxFailed();
+        } else {
+            // sinon, Reessayer
+            $this->startNewAttempt();
+        }
+    }
+
+    /**
+     * @param IHasTreatment $subtreatment
+     */
+    public function subTreatmentSucceed($subtreatment) {
+        // Marquer la requete comme success
+        $this->setSuccess();
     }
 
     private function startNewAttempt() {

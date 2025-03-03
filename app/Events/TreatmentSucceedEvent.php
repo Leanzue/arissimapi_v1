@@ -12,7 +12,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class TreatmentDispatchedEvent
+class TreatmentSucceedEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -20,14 +20,15 @@ class TreatmentDispatchedEvent
      * @var IHasTreatment
      */
     public $hastreatment;
-
     /**
-     * Create a new event instance.
-     * @param IHasTreatment $hastreatment
+     * TreatmentSucceedEvent constructor.
+     * @param $hastreatment
      */
-    public function __construct($hastreatment) {
+    public function __construct($hastreatment)
+    {
         $this->hastreatment = $hastreatment;
-        Log::info("TreatmentDispatchedEvent, " . get_class($hastreatment));
+        Log::info("TreatmentSucceedEvent, " . get_class($hastreatment));
+
     }
 
     /**
