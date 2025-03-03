@@ -23,9 +23,8 @@ class TreatmentJob implements ShouldQueue
     public function __construct($treatment)
     {
         $this->onQueue($treatment->service_class::getQueueName());
-
-        //$treatment->setQueueing();
         TreatmentDispatchedEvent::dispatch($treatment);
+        //$treatment->setQueueing();
         //$treatment->treatmentattempt->setQueueing();
         $this->treatment_id = $treatment->id;
     }

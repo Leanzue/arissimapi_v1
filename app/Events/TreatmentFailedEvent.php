@@ -24,7 +24,7 @@ class TreatmentFailedEvent
      */
     public function __construct($hastreatment) {
         $this->hastreatment = $hastreatment;
-        Log::info("TreatmentFailedEvent, " . get_class($hastreatment));
+        Log::info("TreatmentFailedEvent, " . get_class($hastreatment) . " (" . $hastreatment->id . ")");
     }
 
     /**

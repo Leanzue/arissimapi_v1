@@ -3,9 +3,7 @@
 namespace App\Listeners;
 
 use Illuminate\Support\Facades\Log;
-use App\Models\Treatment\Treatment;
 use App\Events\TreatmentDispatchedEvent;
-use App\Models\Treatment\TreatmentAttempt;
 
 class TreatmentDispatchedListener
 {
@@ -23,9 +21,9 @@ class TreatmentDispatchedListener
      */
     public function handle(TreatmentDispatchedEvent $event): void
     {
-        Log::info("TreatmentDispatchedListener: " . get_class($event->hastreatment));
+        Log::info("TreatmentDispatchedListener: " . get_class($event->hastreatment) . " (" . $event->hastreatment->id . ")");
 
         $event->hastreatment->setQueueing();
-        $event->hastreatment->uppertreatment->subTreatmentDispatched($event->hastreatment);
+        $event->hastreatment->uppertreatment->subTreatmentStatusChanged($event->hastreatment);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Models\Treatment;
 use App\Models\User;
 use App\Models\BaseModel;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 use App\Events\TreatmentSucceedEvent;
 use App\Models\SimRequest\SimRequest;
 use App\Traits\Treatment\HasTreatment;
@@ -184,23 +185,22 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
             return;
         }
 
+        //si le dernier est en attente de traitement
+        if ($this->isWaiting()) {
+            //  -> lancer  a nouveau
+            $this->latesttreatment->dispatchTreatment();
+            return;
+        }
+
         // -> si le dernier traitement est un success,
         if ($this->latesttreatment->isSuccess()) {
-            $this->subTreatmentSucceed($this->latesttreatment);
+            $this->subTreatmentStatusChanged($this->latesttreatment);
             return;
         }
 
         // -> si le dernier est un echec,
         if ($this->latesttreatment->isFailed()) {
-            $this->subTreatmentFailed($this->latesttreatment);
-            return;
-        }
-
-        //si le dernier est en attente de traitement
-        if ($this->isWaiting()) {
-            //  -> lancer  a nouveau
-            $this->latesttreatment->dispatchTreatment();
-            $this->setWaiting();
+            $this->subTreatmentStatusChanged($this->latesttreatment);
             return;
         }
 
@@ -224,49 +224,6 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
                 $this->setWaiting();
             }
             return;
-        }
-    }
-
-    /**
-     * @param IHasTreatment $subtreatment
-     */
-    public function subTreatmentDispatched($subtreatment) {
-        TreatmentDispatchedEvent::dispatch($this);
-    }
-
-    /**
-     * @param IHasTreatment $subtreatment
-     */
-    public function subTreatmentFailed($subtreatment) {
-        //-> re-tenter si le nombre max de tentatives est atteint
-        if ($subtreatment->treatmentresults()->count() >= self::$MAX_TREATMENT_FAILED_RETRY) {
-            // -> marquer la tentative comme Max-Failed (Echec de la tentative)
-            $this->setMaxFailed();
-            //marquer la requete comme failed
-            $this->uppertreatment->subTreatmentFailed($this);
-        } else {
-            // -> sinon Reessayer a nouveau
-            // $this->setWaiting();
-            $subtreatment->dispatchTreatment();
-        }
-    }
-
-    /**
-     * @param IHasTreatment $subtreatment
-     */
-    public function subTreatmentSucceed($subtreatment) {
-        // on passe au suivant
-        $treatment = $this->getNextTreatment();
-        // s'il n y a pas de traitement suivant,
-        if (is_null($treatment)) {
-            // marquer la tentative comme success
-            $this->setSuccess();
-            // et marquer la requete comme success
-            TreatmentSucceedEvent::dispatch($this);
-        } else {
-            // sinon, on l'execute
-            $treatment->dispatchTreatment();
-            //$this->setWaiting();
         }
     }
 
@@ -324,4 +281,59 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
     }
     #endregion
 
+    #region Treatment Status Management
+    /**
+     * @param IHasTreatment $subtreatment
+     */
+    public function subTreatmentStatusChanged($subtreatment)
+    {
+        if ( $subtreatment->isQueueing() ) {
+            TreatmentDispatchedEvent::dispatch($this);
+        } elseif ( $subtreatment->isRunning() ) {
+            // TODO dd
+        } elseif ( $subtreatment->isSuccess() ) {
+            $this->subTreatmentSucceed($subtreatment);
+        } elseif ( $subtreatment->isFailed() ) {
+            $this->subTreatmentFailed($subtreatment);
+        }
+    }
+
+    /**
+     * @param IHasTreatment $subtreatment
+     */
+    public function subTreatmentFailed($subtreatment) {
+        //-> re-tenter si le nombre max de tentatives est atteint
+        if ($subtreatment->treatmentresults()->count() >= self::$MAX_TREATMENT_FAILED_RETRY) {
+            // -> marquer la tentative comme Max-Failed (Echec de la tentative)
+            $this->setMaxFailed();
+            //marquer la requete comme failed
+            $this->uppertreatment->subTreatmentFailed($this);
+        } else {
+            // -> sinon Reessayer a nouveau
+            $this->setWaiting();
+            //$subtreatment->dispatchTreatment();
+        }
+    }
+
+    /**
+     * @param IHasTreatment|Treatment $subtreatment
+     */
+    public function subTreatmentSucceed($subtreatment) {
+        // on passe au suivant
+        Log::info("TreatmentAttempt - subTreatmentSucceed (" . $subtreatment->id . "). service: " . $subtreatment->service_class);
+        $treatment = $this->getNextTreatment();
+        // s'il n y a pas de traitement suivant,
+        if (is_null($treatment)) {
+            // marquer la tentative comme success
+            $this->setSuccess();
+            // et marquer la requete comme success
+            //TreatmentSucceedEvent::dispatch($this);
+            $this->uppertreatment->subTreatmentSucceed($this);
+        } else {
+            // sinon, on l'execute
+            $treatment->dispatchTreatment();
+            //$this->setWaiting();
+        }
+    }
+    #endregion
 }

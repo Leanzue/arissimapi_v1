@@ -23,9 +23,9 @@ class TreatmentSucceedListener
      */
     public function handle(TreatmentSucceedEvent $event): void
     {
-        Log::info("TreatmentSuccessListener: " . get_class($event->hastreatment));
+        Log::info("TreatmentSuccessListener: " . get_class($event->hastreatment) . " (" . $event->hastreatment->id . ")");
 
         $event->hastreatment->setSuccess();
-        $event->hastreatment->uppertreatment->subTreatmentSucceed($event->hastreatment);
+        $event->hastreatment->uppertreatment->subTreatmentStatusChanged($event->hastreatment);
     }
 }

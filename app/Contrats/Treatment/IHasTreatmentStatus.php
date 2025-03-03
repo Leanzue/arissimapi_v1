@@ -52,16 +52,6 @@ interface IHasTreatmentStatus
     /**
      * @param IHasTreatment $subtreatment
      */
-    public function subTreatmentDispatched($subtreatment);
-
-    /**
-     * @param IHasTreatment $subtreatment
-     */
-    public function subTreatmentFailed($subtreatment);
-
-    /**
-     * @param IHasTreatment $subtreatment
-     */
-    public function subTreatmentSucceed($subtreatment);
+    public function subTreatmentStatusChanged($subtreatment);
     #endregion
 }

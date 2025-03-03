@@ -112,6 +112,11 @@ class TreatmentStatus extends BaseModel
             ->where('code', "failed");
     }
 
+    public function scopeMaxfailed($query) {
+        return $query
+            ->where('code', "maxfailed");
+    }
+
     /**
      * @return TreatmentStatus|TValue|null
      */

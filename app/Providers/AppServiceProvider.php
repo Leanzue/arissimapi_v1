@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Events\TreatmentSuccess;
+
 use App\Events\TreatmentFailedEvent;
 use Illuminate\Support\Facades\Event;
 use App\Events\TreatmentSucceedEvent;
@@ -11,7 +11,6 @@ use App\Events\TreatmentDispatchedEvent;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use App\Listeners\TreatmentFailedListener;
-use App\Listeners\TreatmentSuccesslistener;
 use App\Listeners\TreatmentSucceedListener;
 use App\Listeners\TreatmentDispatchedListener;
 
@@ -68,8 +67,8 @@ class AppServiceProvider extends ServiceProvider
             }
         });
 
-        Event::listen(TreatmentDispatchedEvent::class, TreatmentDispatchedListener::class,);
-        Event::listen(TreatmentFailedEvent::class, TreatmentFailedListener::class,);
-        Event::listen(TreatmentSucceedEvent::class, TreatmentSucceedListener::class,);
+        //Event::listen(TreatmentDispatchedEvent::class, TreatmentDispatchedListener::class,);
+        //Event::listen(TreatmentFailedEvent::class, TreatmentFailedListener::class,);
+        //Event::listen(TreatmentSucceedEvent::class, TreatmentSucceedListener::class,);
     }
 }

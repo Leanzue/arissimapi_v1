@@ -26,9 +26,9 @@ class TreatmentFailedListener
      */
     public function handle(TreatmentFailedEvent $event): void
     {
-        Log::info("TreatmentFailedListener: " . get_class($event->hastreatment));
+        Log::info("TreatmentFailedListener: " . get_class($event->hastreatment) . " (" . $event->hastreatment->id . ")");
 
         $event->hastreatment->setFailed();
-        $event->hastreatment->uppertreatment->subTreatmentFailed($event->hastreatment);
+        $event->hastreatment->uppertreatment->subTreatmentStatusChanged($event->hastreatment);
     }
 }

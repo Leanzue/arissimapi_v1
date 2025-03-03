@@ -8,6 +8,7 @@ use App\Jobs\Treatment\TreatmentJob;
 use App\Events\TreatmentFailedEvent;
 use App\Events\TreatmentSucceedEvent;
 use App\Traits\Treatment\HasTreatment;
+use App\Events\TreatmentDispatchedEvent;
 use App\Contrats\Treatment\IHasTreatment;
 use App\Contrats\Treatment\ITreatmentService;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -157,9 +158,10 @@ class Treatment extends BaseModel implements IHasTreatment
             $this->uppertreatment->setWaiting();
         } elseif ($result->resultat === 1) {
             // succes traitement
-            $this->setSuccess();
+            //$this->setSuccess();
            // $this->uppertreatment->setWaiting();
             TreatmentSucceedEvent::dispatch($this);
+            //$this->uppertreatment->subTreatmentSucceed($this);
         } elseif ($result->resultat === -1) {
             // échec traitement
             //$this->setFailed();
@@ -176,6 +178,7 @@ class Treatment extends BaseModel implements IHasTreatment
 
     public function dispatchTreatment() {
         TreatmentJob::dispatch($this);
+        //$this->uppertreatment->subTreatmentDispatched($this);
     }
     #endregion
 
@@ -187,18 +190,8 @@ class Treatment extends BaseModel implements IHasTreatment
         return Treatment::find($id);
     }
 
-    public function subTreatmentDispatched($subtreatment)
+    public function subTreatmentStatusChanged($subtreatment)
     {
-        // TODO: Implement subTreatmentDispatched() method.
-    }
-
-    public function subTreatmentFailed($subtreatment)
-    {
-        // TODO: Implement subTreatmentFailed() method.
-    }
-
-    public function subTreatmentSucceed($subtreatment)
-    {
-        // TODO: Implement subTreatmentSucceed() method.
+        // TODO: Implement subTreatmentStatusChanged() method.
     }
 }
