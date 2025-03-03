@@ -307,7 +307,7 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
             // -> marquer la tentative comme Max-Failed (Echec de la tentative)
             $this->setMaxFailed();
             //marquer la requete comme failed
-            $this->uppertreatment->subTreatmentFailed($this);
+            $this->uppertreatment->subTreatmentStatusChanged($this);
         } else {
             // -> sinon Reessayer a nouveau
             $this->setWaiting();
@@ -328,7 +328,7 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
             $this->setSuccess();
             // et marquer la requete comme success
             //TreatmentSucceedEvent::dispatch($this);
-            $this->uppertreatment->subTreatmentSucceed($this);
+            $this->uppertreatment->subTreatmentStatusChanged($this);
         } else {
             // sinon, on l'execute
             $treatment->dispatchTreatment();

@@ -5,6 +5,7 @@ namespace App\Models\SimRequest;
 use App\Models\Sim\Sim;
 use App\Models\BaseModel;
 use App\Traits\Code\HasCode;
+use App\Events\TreatmentDispatchedEvent;
 use App\Contrats\Treatment\IHasTreatment;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
@@ -325,13 +326,26 @@ class SimRequest extends BaseModel implements IHasTreatment
 
         // si la derniere tentative a reussi
         if ($this->latesttreatmentattempt->isSuccess()) {
-            $this->subTreatmentSucceed($this->latesttreatmentattempt);
+            $this->subTreatmentStatusChanged($this->latesttreatmentattempt);
             return;
         }
 
         // si la derniere tentative a échoué
         if ($this->latesttreatmentattempt->isFailed()) {
-            $this->subTreatmentFailed($this->latesttreatmentattempt);
+            $this->subTreatmentStatusChanged($this->latesttreatmentattempt);
+        }
+    }
+
+     public function subTreatmentStatusChanged($subtreatment)
+    {
+        if ( $subtreatment->isQueueing() ) {
+            TreatmentDispatchedEvent::dispatch($this);
+        } elseif ( $subtreatment->isRunning() ) {
+            // TODO dd
+        } elseif ( $subtreatment->isSuccess() ) {
+            $this->subTreatmentSucceed($subtreatment);
+        } elseif ( $subtreatment->isFailed() ) {
+            $this->subTreatmentFailed($subtreatment);
         }
     }
 
@@ -386,4 +400,5 @@ class SimRequest extends BaseModel implements IHasTreatment
             }
         });
     }
+
 }
