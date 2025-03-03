@@ -19,10 +19,8 @@ set reportfilefolder=report.csv
 CD %responsefolder%
 c:
 
-sqlcmd -E -Q "EXEC OSS360.dbo._STATUTS_SIM @ICC='%iccparam%" -o %fileresponse% -S "192.168.7.50,1433" -t 65534 -s "|"
+sqlcmd -E -Q "EXEC OSS360.dbo._STATUTS_SIM @ICC='%iccparam%'" -o %fileresponse% -S "192.168.7.50,1433" -t 65534 -s "|"
 
 rem -U "%username%" -P "%userpwd%"
-
-pause
 
 exit

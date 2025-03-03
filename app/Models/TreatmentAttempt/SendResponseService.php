@@ -28,6 +28,11 @@ class SendResponseService implements ITreatmentService
      */
     public $treatmentresult;
 
+    public static function getQueueName()
+    {
+        return "sendresponseservice";
+    }
+
     /**
      * @param Treatment $treatment
      * @return TreatmentResult

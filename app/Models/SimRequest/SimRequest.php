@@ -7,9 +7,10 @@ use App\Models\BaseModel;
 use App\Traits\Code\HasCode;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
+use App\Models\TreatmentAttempt\Treatment;
+use App\Traits\TreatmentAttempt\HasTreatment;
 use App\Models\TreatmentAttempt\TreatmentStatus;
 use App\Models\TreatmentAttempt\TreatmentAttempt;
-use \Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 
@@ -17,16 +18,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  *class simrequests
  * @package App\Models
  *
+ * @property int $id
  * @property string $code
  * @property string $client_ip_address
  * @property string $url_response
  * @property string $description
  *
- * @property integer|null $request_status_id
+ * @property integer|null $treatment_status_id
  * @property integer|null $request_type_id
  *
  * @property string|null $file_prefix
  * @property string|null $file_extension
+ * @property int| $client_id_request
  *
  * @property RequestStatus $requeststatuses
  * @property RequestType $requestTypes
@@ -38,18 +41,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property SimRequestResponseFile $latestresponsefile
  * @property TreatmentAttempt[] $treatmentattempts
  * @property TreatmentAttempt $latesttreatmentattempt
+ *
+ * @property Treatment $currenttreatment
  */
 
 class SimRequest extends BaseModel
 {
     public static $REQRESPONSE_FOLDER_CONFIG_DIR = "reqresponse_folder";
-    public static $WAITING_PARSE_STATUS_CODE = "tobeparsed";
     public static $REQRESPONSE_FILE_KEY= "_res";
-    pUBLIC static $MAX_TREATMENT_FAILED_RETRY= 5 ;
+    pUBLIC static $MAX_ATTEMPTS_FAILED_RETRY = 5 ;
 
 
     /** @use HasFactory<\Database\Factories\SimRequestFactory> */
-    use HasFactory, HasCode;
+    use HasFactory, HasCode, HasTreatment;
 
     protected $guarded = [];
 
@@ -117,14 +121,6 @@ class SimRequest extends BaseModel
     #endregion
 
     #region Relationships
-    /**
-     * @return BelongsTo
-     */
-    public function requeststatus()
-    {
-        return $this->belongsTo(RequestStatus::class, 'request_status_id');
-    }
-
     public function requesttype()
     {
         return $this->belongsTo(RequestType::class, 'request_type_id');
@@ -154,39 +150,15 @@ class SimRequest extends BaseModel
     {
         return $this->hasOne(TreatmentAttempt::class, 'sim_request_id')->ofMany('id', 'max');
     }
-    #endregion
 
-
-
-    #region Gestion des Status de la Requete
-    public function setWaiting()
-    {
-        // application du statut running (en utilisant le scope)
-        $this->setRequestStatus(RequestStatus::getWaitingStatus());
-    }
-    public function setRunning()
-    {
-        // application du statut running (en utilisant le scope)
-        $this->setRequestStatus(RequestStatus::getRunningStatus());
-    }
-
-    public function setWaitingParse()
-    {
-        // recuperation du status dont le code est WAITING_PARSE_STATUS_CODE
-        $running_status = RequestStatus::where('code', self::$WAITING_PARSE_STATUS_CODE)->first();
-        if ($running_status) {
-            // si ce status existe, association de la cle etrangere
-            $this->requeststatus()->associate($running_status)->save();
-        }
-    }
     /**
-     * @param RequestStatus $requeststatus
+     * @return Treatment|null
      */
-    private function setRequestStatus($requeststatus) {
-        if ($requeststatus) {
-            // si ce status existe, association de la cle etrangere
-            $this->requeststatus()->associate($requeststatus)->save();
+    public function getCurrenttreatmentAttribute() {
+        if (! $this->latesttreatmentattempt) {
+            return null;
         }
+        return $this->latesttreatmentattempt->latesttreatment;
     }
     #endregion
 
@@ -203,7 +175,7 @@ class SimRequest extends BaseModel
      */
     public static function getWaitingRequests()
     {
-        return SimRequest::where('request_status_id', TreatmentStatus::getWaitingStatus()->id)->get();
+        return SimRequest::where('treatment_status_id', TreatmentStatus::getWaitingStatus()->id)->get();
     }
 
     /**
@@ -222,14 +194,16 @@ class SimRequest extends BaseModel
      * @param string $url_response
      * @param string $file_extension
      * @param string $file_prefix
+     * @param string $client_id_request
      * @param string $description
      * @param RequestType|null $request_type
      * @return SimRequest
      */
-    public static function insertData($sim, $client_ip_address, $url_response, $file_extension, $file_prefix = "", $description = "", $request_type = null)
+    public static function insertData($sim, $client_ip_address, $url_response, $file_extension, $file_prefix = "", $client_id_request = -1, $description = "", $request_type = null)
     {
         $new_simrequest = self::create([
             'client_ip_address' => $client_ip_address,
+            'client_id_request' => $client_id_request,
             'url_response' => $url_response,
             'file_prefix' => $file_prefix,
             'file_extension' => $file_extension,
@@ -264,14 +238,16 @@ class SimRequest extends BaseModel
      * @param string $url_response
      * @param string $file_extension
      * @param string $file_prefix
+     * @param int $client_id_request
      * @param string $description
      * @param RequestType|null $request_type
      * @return $this
      */
-    public function updateOne($sim, $client_ip_address, $url_response, $file_extension, $file_prefix = "", $description = "", $request_type = null)
+    public function updateOne($sim, $client_ip_address, $url_response, $file_extension, $file_prefix = "", $client_id_request = -1, $description = "", $request_type = null)
     {
         $this->description = $description;
         $this->client_ip_address = $client_ip_address;
+        $this->client_id_request = $client_id_request;
         $this->url_response = $url_response;
         $this->file_extension = $file_extension;
         $this->file_prefix = $file_prefix;
@@ -279,6 +255,9 @@ class SimRequest extends BaseModel
         if (!is_null($request_type)) {
             $this->requesttype()->associate($request_type);
         }
+
+        // Assignation de la sim
+        $this->sim()->associate($sim);
 
         $this->save();
 
@@ -291,18 +270,19 @@ class SimRequest extends BaseModel
      * @param string $url_response
      * @param string $file_extension
      * @param string $file_prefix
+     * @param string $client_id_request
      * @param string $description
      * @param RequestType|null $request_type
      * @return SimRequest
      */
-    public static function updateOrNew($sim, $client_ip_address, $url_response, $file_extension, $file_prefix = "", $description = "", $request_type = null)
+    public static function updateOrNew($sim, $client_ip_address, $url_response, $file_extension, $file_prefix = "", $client_id_request = -1, $description = "", $request_type = null)
     {
         $simrequest = SimRequest::where('sim_id', $sim->id)->where('client_ip_address',$client_ip_address)->first();
 
         if ($simrequest) {
-            return $simrequest->updateOne($sim, $client_ip_address, $url_response, $file_extension, $file_prefix, $description, $request_type);
+            return $simrequest->updateOne($sim, $client_ip_address,$url_response, $file_extension, $file_prefix,$client_id_request , $description, $request_type);
         } else {
-            return SimRequest::insertData($sim, $client_ip_address, $url_response, $file_extension, $file_prefix, $description, $request_type);
+            return SimRequest::insertData($sim, $client_ip_address, $url_response, $file_extension, $file_prefix,$client_id_request , $description, $request_type);
         }
     }
     #endregion
@@ -320,47 +300,52 @@ class SimRequest extends BaseModel
     {
         // S'il n'y a pas de tentative,
         if ($this->treatmentattempts()->count() === 0) {
-            // dd("execRequest 1ere");
-            // Creer une nouvelle et l'executer
-            $treatmentattempt = TreatmentAttempt::insertData($this, "premiere tentative d execution");
-            $treatmentattempt->executeAttempt();
+            // Creer une nouvelle
+            $this->startNewAttempt();
             return;
-            // recuperer la dernière tentative
-            $latesttreatmentattempt = $this->treatmentattempts()->latest()->firts();
-            //si la derniere tentative a reussi
-            if ($latestAttempt->isSuccess()) {
-                // Passer à la suivante, s'il y en a une
-                $nextAttempt = $this->createNextAttempt();
-                if ($nextAttempt) {
-                    $nextAttempt->executeAttempt();
-                } else {
-                    // Si aucune autre tentative n'est nécessaire, marquer la requête comme terminée
-                    $this->setEnded();
-                }
-                // Si la tentative a échoué
-                elseif ($latestAttempt->isFailed());
-                //-> ressayer si le nombre maximal n'est pas atteint
-                if  ( $this-> latesttreatmentattempt->treatments()->count() >= self::$MAX_TREATMENT_FAILED_RETRY ) { }
-                //sinon marquer la tentative comme echec
-                // si la derniere tentative est en attente
-                //-> relancer la tentative
-
-            } }
         }
 
-        #endregion
-
-        public static function boot()
-        {
-            parent::boot();
-
-            self::created(function ($simrequest) {
-                // insertion du file prefixe
-                if (is_null($simrequest->file_prefix) || $simrequest->file_prefix === "") {
-                    $simrequest->file_prefix = $simrequest->code;
-                    $simrequest->save();
-                }
-            });
+        // si la derniere tentative a reussi
+        if ($this->latesttreatmentattempt->isSuccess()) {
+            // Marquer la requete comme success
+            $this->setSuccess();
+            return;
         }
+
+        // si la derniere tentative a échoué
+        if ($this->latesttreatmentattempt->isFailed()) {
+            //-> ressayer si le nombre maximal de tentative est atteint
+            if ($this->treatmentattempts()->count() >= self::$MAX_ATTEMPTS_FAILED_RETRY ) {
+                // Marquer le requete comme failed
+                $this->setMaxFailed();
+            } else {
+                // sinon, Reessayer
+                $this->startNewAttempt();
+            }
+        }
+    }
+
+    private function startNewAttempt() {
+        $attempt_no = $this->treatmentattempts()->count() + 1;
+        $treatmentattempt = TreatmentAttempt::insertData($this, "Tentative Execution N° " . $attempt_no);
+        $treatmentattempt->executeAttempt();
+        //$this->setTrying();
+    }
+
+
+    #endregion
+
+    public static function boot()
+    {
+        parent::boot();
+
+        self::created(function ($simrequest) {
+            // insertion du file prefixe
+            if (is_null($simrequest->file_prefix) || $simrequest->file_prefix === "") {
+                $simrequest->file_prefix = $simrequest->code;
+                $simrequest->save();
+            }
+        });
+    }
 
 }

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Str;
-use App\Models\TreatmentAttempt;
+use App\Models\TreatmentAttempt\TreatmentAttempt;
 use App\Http\Requests\TreatmentAttempt\StoreTreatmentAttemptRequest;
 use App\Http\Requests\TreatmentAttempt\UpdateTreatmentAttemptRequest;
 

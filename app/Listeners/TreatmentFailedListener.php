@@ -3,11 +3,14 @@
 namespace App\Listeners;
 
 use Illuminate\Support\Facades\Log;
+use App\Events\TreatmentFailedEvent;
 use App\Events\TreatmentDispatchedEvent;
 use App\Models\TreatmentAttempt\Treatment;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
 use App\Models\TreatmentAttempt\TreatmentAttempt;
 
-class TreatmentDispatchedListener
+class TreatmentFailedListener
 {
     /**
      * Create the event listener.
@@ -20,19 +23,19 @@ class TreatmentDispatchedListener
     /**
      * Handle the event.
      */
-    public function handle(TreatmentDispatchedEvent $event): void
+    public function handle(TreatmentFailedEvent $event): void
     {
-        Log::info("TreatmentDispatchedListener: " . get_class($event->hastreatment));
+        Log::info("TreatmentFailedListener: " . get_class($event->hastreatment));
         $event->hastreatment;
 
-        $event->hastreatment->setQueueing();
+        $event->hastreatment->setFailed();
 
         if ( get_class($event->hastreatment) === Treatment::class ) {
             // Cas de Treatment
-            TreatmentDispatchedEvent::dispatch($event->hastreatment->treatmentattempt);
+            TreatmentFailedEvent::dispatch($event->hastreatment->treatmentattempt);
         } elseif ( get_class($event->hastreatment) === TreatmentAttempt::class ) {
             // Cas de TreatmentAttempt
-            $event->hastreatment->simrequest->setQueueing();
+            $event->hastreatment->simrequest->setFailed();
         }
     }
 }

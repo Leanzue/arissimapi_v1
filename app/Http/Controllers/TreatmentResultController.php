@@ -56,7 +56,7 @@ class TreatmentResultController extends Controller
      */
     public function edit(TreatmentResult $treatementResult)
     {
-        return view('treatementResults.edit', compact('treatementResult'));
+        return view('treatementResults.edit', compact('treatementResults'));
     }
 
     /**

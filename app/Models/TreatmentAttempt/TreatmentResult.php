@@ -123,7 +123,7 @@ class TreatmentResult extends BaseModel
      */
     public static function createNewResult($hastreatmentresult, $simrequest, $libelle_service) {
         $resultat = 0;
-        $libelle = $libelle_service . " la requete n° " . $simrequest->id;
+        $libelle = $libelle_service . " - Requete n° " . $simrequest->id;
         $details = "En cours";
 
         return $hastreatmentresult->addNewTreatmentresult($resultat, $libelle, $details);
@@ -137,6 +137,8 @@ class TreatmentResult extends BaseModel
     public function setSuccess($message = "Succes") {
         $this->details = $message;
         $this->resultat = 1;
+
+        $this->save();
     }
 
     /**
@@ -147,6 +149,8 @@ class TreatmentResult extends BaseModel
     public function setFailed($message) {
         $this->details = "Echec - " . $message;
         $this->resultat = -1;
+
+        $this->save();
     }
     #endregion
 

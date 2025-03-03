@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Treatment;
-use App\Http\Requests\StoreTreatmentStatusRequest;
-use App\Http\Requests\UpdateTreatmentStatusRequest;
+
+use App\Models\TreatmentAttempt\Treatment;
+use App\Http\Requests\TreatmentStatus\StoreTreatmentStatusRequest;
+use App\Http\Requests\TreatmentStatus\UpdateTreatmentStatusRequest;
 
 class TreatmentController extends Controller
 {
@@ -13,7 +14,8 @@ class TreatmentController extends Controller
      */
     public function index()
     {
-        //
+        $treatments = Treatment::all();
+        return view('treatments.index', compact('treatments'));
     }
 
     /**
@@ -21,7 +23,7 @@ class TreatmentController extends Controller
      */
     public function create()
     {
-        //
+        return view('Treatments.create');
     }
 
     /**

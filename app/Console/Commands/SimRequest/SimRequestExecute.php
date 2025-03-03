@@ -31,15 +31,15 @@ class SimRequestExecute extends Command
         //dd(count($waiting_requests));
         if (count($waiting_requests) === 0) {
             // retourner un message pour signifier
-            $this->error("aucune requete en attente");
-            \Log::info("Aucune Requete en attente !");
+            $this->error("aucune requete a executer");
+            \Log::info("Aucune Requete a executer !");
         } else {
             // 2. Parcour des requetes en vue de:
             foreach ($waiting_requests as $waiting_request){
                 $waiting_request->execRequest();
                 // Ajouter un message de confirmation pour la fin du traitement
                 $this->info("SimRequest exécuté avec succès.");
-                \Log::info("SimRequest exécuté avec succès pour toutes les requêtes en attente.");
+                \Log::info("SimRequest exécuté avec succès pour toutes les requêtes a executer.");
             }
         }
     }

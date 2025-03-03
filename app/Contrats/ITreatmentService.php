@@ -14,4 +14,9 @@ interface ITreatmentService
      * @return TreatmentResult
      */
     public function execTreatment($treatment): TreatmentResult;
+
+    /**
+     * @return string
+     */
+    public static function getQueueName();
 }

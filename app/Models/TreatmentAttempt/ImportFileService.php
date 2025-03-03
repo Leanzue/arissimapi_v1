@@ -9,7 +9,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Models\SimRequest\SimRequest;
 use App\Imports\SimRequestResponseFilesImport;
 
-class ImportFileServie implements ITreatmentService
+class ImportFileService implements ITreatmentService
 {
     /**
      * @var SimRequest
@@ -28,7 +28,7 @@ class ImportFileServie implements ITreatmentService
 
     public static function getQueueName()
     {
-        return "importfileservie";
+        return "importfileservice";
     }
 
     /**

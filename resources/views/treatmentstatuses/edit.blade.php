@@ -4,42 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modifier le Statut</title>
+    <!-- Ajout de Bootstrap pour un style moderne -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Lien vers votre fichier CSS personnalisé -->
     <link rel="stylesheet" href="{{ asset('public/css/custom.css') }}">
 </head>
 <body>
-<header>
-    <nav>
-    </nav>
-</header>
-<main>
+<header class="bg-primary text-white text-center py-4">
     <h1>Modifier le Statut</h1>
-    <form method="POST" action="{{ url('api/attemptstatuses/'.$attemptstatuses->id) }}">
+</header>
+
+<main class="container my-5">
+    <form method="POST" action="{{ url('api/treatmentstatuses/'.$treatmentstatuses->id) }}" class="needs-validation" novalidate>
         @csrf
         @method('PUT')
-        <div>
-            <label for="nombre_essais">Nombre d'Essais :</label>
-            <input type="number" name="nombre_essais" id="nombre_essais" value="{{ $attemptstatuses->nombre_essais }}" required>
+        <div class="mb-3">
+            <label for="code" class="form-label">Code :</label>
+            <input type="number" name="code" id="code" class="form-control" value="{{ $treatmentstatuses->code }}" required>
+            <div class="invalid-feedback">
+                Veuillez fournir un code valide.
+            </div>
         </div>
-        <div>
-            <label for="error_code">Code d'Erreur :</label>
-            <input type="number" name="error_code" id="error_code" value="{{ $attemptstatuses->error_code }}" required>
+
+        <div class="mb-3">
+            <label for="libelle" class="form-label">Libelle :</label>
+            <input type="number" name="libelle" id="libelle" class="form-control" value="{{ $treatmentstatuses->libelle }}" required>
+            <div class="invalid-feedback">
+                Veuillez fournir un libellé valide.
+            </div>
         </div>
-        <div>
-            <label for="details">Détails :</label>
-            <input type="text" name="details" id="details" value="{{ $attemptstatuses->details }}" required>
-        </div>
-        <div>
-            <label for="status">Statut :</label>
-            <input type="text" name="status" id="status" value="{{ $attemptstatuses->status }}" required>
-        </div>
-        <div>
-            <label for="comment">Commentaire :</label>
-            <input type="text" name="comment" id="comment" value="{{ $attemptstatuses->comment }}" required>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Description :</label>
+            <textarea name="description" id="description" class="form-control" rows="3" required>{{ $treatmentstatuses->description }}</textarea>
+            <div class="invalid-feedback">
+                Veuillez fournir une description valide.
+            </div>
         </div>
 
         <button type="submit" class="btn btn-primary">Mettre à Jour</button>
     </form>
 </main>
+
+<!-- Ajout de Bootstrap JS et Popper.js pour les fonctionnalités interactives -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+<!-- Lien vers votre fichier JS personnalisé -->
 <script src="{{ asset('js/app.js') }}"></script>
+
+<!-- Script pour la validation du formulaire -->
+<script>
+</script>
 </body>
 </html>

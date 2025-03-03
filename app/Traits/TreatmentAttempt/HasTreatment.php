@@ -9,6 +9,12 @@ use Illuminate\Support\Facades\Log;
 use App\Models\TreatmentAttempt\TreatmentStatus;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Trait HasTreatment
+ * @package App\Traits\TreatmentAttempt
+ *
+ * @property TreatmentStatus $treatmentstatus
+ */
 trait HasTreatment
 {
     /**
@@ -36,6 +42,18 @@ trait HasTreatment
         $this->setRequestStatus(TreatmentStatus::getWaitingStatus(), "Waiting");
     }
 
+    public function setQueueing()
+    {
+        // application du statut queueing (en utilisant le scope)
+        $this->setRequestStatus(TreatmentStatus::getQueueingStatus(), "Queueing");
+    }
+
+    public function setTrying()
+    {
+        // application du statut trying (en utilisant le scope)
+        $this->setRequestStatus(TreatmentStatus::getTryingStatus(), "Trying");
+    }
+
     public function setRunning()
     {
         // application du statut running (en utilisant le scope)
@@ -53,11 +71,25 @@ trait HasTreatment
         // application du statut Failed (en utilisant le scope)
         $this->setRequestStatus(TreatmentStatus::getFailedStatus(), "Failed");
     }
+
+    public function setMaxFailed()
+    {
+        // application du statut Failed (en utilisant le scope)
+        $this->setRequestStatus(TreatmentStatus::getMaxFailedStatus(), "Max Failed");
+    }
+
     public function setSuspended()
     {
         // application du statut Failed (en utilisant le scope)
         $this->setRequestStatus(TreatmentStatus::getSuspendedStatus(), "Suspended");
     }
+
+    public function setMaxSuspended()
+    {
+        // application du statut Failed (en utilisant le scope)
+        $this->setRequestStatus(TreatmentStatus::getMaxSuspendedStatus(), "Max Suspended");
+    }
+
 
     /**
      * @param TreatmentStatus $requeststatus
@@ -72,23 +104,33 @@ trait HasTreatment
         }
     }
 
-    public function isEnded() {
-        return $this->attemptstatus->code === TreatmentStatus::getEndedStatus()->code;
-    }
+    // Les Etats
     public function isWaiting() {
-        return $this->attemptstatus->code === TreatmentStatus::getWaitingStatus()->code;
+        return $this->treatmentstatus->code === TreatmentStatus::getWaitingStatus()->code;
+    }
+    public function isQueueing() {
+        return $this->treatmentstatus->code === TreatmentStatus::getQueueingStatus()->code;
+    }
+    public function isTrying() {
+        return $this->treatmentstatus->code === TreatmentStatus::getTryingStatus()->code;
     }
     public function isRunning() {
-        return $this->attemptstatus->code === TreatmentStatus::getRunningStatus()->code;
+        return $this->treatmentstatus->code === TreatmentStatus::getRunningStatus()->code;
     }
     public function isSuccess() {
-        return $this->attemptstatus->code === TreatmentStatus::getSuccessStatus()->code;
+        return $this->treatmentstatus->code === TreatmentStatus::getSuccessStatus()->code;
     }
     public function isFailed() {
-        return $this->attemptstatus->code === TreatmentStatus::getFailedStatus()->code;
+        return $this->treatmentstatus->code === TreatmentStatus::getFailedStatus()->code;
+    }
+    public function isMaxFailed() {
+        return $this->treatmentstatus->code === TreatmentStatus::getMaxFailedStatus()->code;
     }
     public function isSuspended() {
-        return $this->attemptstatus->code === TreatmentStatus::getSuspendedStatus()->code;
+        return $this->treatmentstatus->code === TreatmentStatus::getSuspendedStatus()->code;
+    }
+    public function isMaxSuspended() {
+        return $this->treatmentstatus->code === TreatmentStatus::getMaxSuspendedStatus()->code;
     }
     #endregion
 

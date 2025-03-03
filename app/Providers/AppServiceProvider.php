@@ -2,9 +2,14 @@
 
 namespace App\Providers;
 
+use App\Events\TreatmentFailedEvent;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use App\Events\TreatmentDispatchedEvent;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use App\Listeners\TreatmentFailedListener;
+use App\Listeners\TreatmentDispatchedListener;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -59,6 +64,7 @@ class AppServiceProvider extends ServiceProvider
             }
         });
 
-
+        Event::listen(TreatmentDispatchedEvent::class, TreatmentDispatchedListener::class,);
+        Event::listen(TreatmentFailedEvent::class, TreatmentFailedListener::class,);
     }
 }

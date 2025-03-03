@@ -2,11 +2,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Str;
-use Illuminate\Http\Request;
 use App\Models\TreatmentAttempt\TreatmentStatus;
 use App\Http\Requests\TreatmentStatus\StoreTreatmentStatusRequest;
 use App\Http\Requests\TreatmentStatus\UpdateTreatmentStatusRequest;
-use Maatwebsite\Excel\Facades\Excel;
+
 
 class TreatmentStatusController extends Controller
 {
@@ -16,84 +15,79 @@ class TreatmentStatusController extends Controller
      */
     public function index()
     {
-        $attemptstatuses = TreatmentStatus::all();
-        return view('attemptstatuses.index', compact('attemptstatuses'));
+        $treatmentstatuses = TreatmentStatus::all();
+        return view('treatmentstatuses.index', compact('treatmentstatuses'));
 
     }
 
     public function create()
     {
-        return view('attemptstatuses.create');
+        return view('treatmentstatuses.create');
     }
 
     /**
-     * Store a newly created resource in storage.
      * @param StoreTreatmentStatusRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return mixed
      */
     public function store(StoreTreatmentStatusRequest $request)
     {
-        $attemptStatus = TreatmentStatus::create([
+        $treatmentstatus = TreatmentStatus::create([
             'uuid' => Str::uuid()->toString(),
-            'nombre_essais' => $request->nombre_essais,
-            'error_code' => $request->error_code,
-            'details' => $request->details,
-            'statut' => $request->statut,
-            'comment' => $request->comment,
+            'code' => $request->code,
+            'libelle' => $request->libelle,
+            'description' => $request->description,
         ]);
 
-        return response()->json($attemptStatus, 201);
+        return response()->json($treatmentstatus, 201);
     }
 
     /**
      * Display the specified resource.
-     * @param TreatmentStatus $attemptstatus
+     * @param TreatmentStatus $treatmentstatus
      * @return TreatmentStatus
      */
-    public function show(TreatmentStatus $attemptstatus)
+    public function show(TreatmentStatus $treatmentstatus)
     {
-        return $attemptstatus;
+        return $treatmentstatus;
     }
 
     /**
      * Show the form for editing the specified resource.
-     * @param TreatmentStatus $attemptstatus
+     * @param TreatmentStatus $treatmentstatus
      * @return \Illuminate\Contracts\View\View
      */
-    public function edit(TreatmentStatus $attemptstatuses)
+    public function edit(TreatmentStatus $treatmentstatuses)
     {
-        return view('attemptstatuses.edit', compact('attemptstatuses'));
+        return view('treatmentstatuses.edit', compact('treatmentstatuses'));
     }
 
 
     /**
      * Update the specified resource in storage.
      * @param UpdateTreatmentStatusRequest $request
-     * @param TreatmentStatus $attemptstatus
+     * @param TreatmentStatus $treatmentstatus
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdateTreatmentStatusRequest $request, TreatmentStatus $attemptstatus)
+    public function update(UpdateTreatmentStatusRequest $request, TreatmentStatus $treatmentstatus)
     {
-        $attemptstatus->update([
+        $treatmentstatus->update([
             'uuid' => Str::uuid()->toString(),
-            'nombre_essais' => $request->nombre_essais,
-            'error_code' => $request->error_code,
-            'details' => $request->details,
-            'statut' => $request->statut,
-            'comment' => $request->comment,
+            'code' => $request->code,
+            'libelle' => $request->libelle,
+            'description' => $request->description,
         ]);
-        return redirect()->route('attemptstatuses.index');
+        return redirect()->route('treatmentstatuses.index');
     }
 
 
     /**
      * Remove the specified resource from storage.
-     * @param TreatmentStatus $attemptstatus
+     * @param TreatmentStatus $treatmentstatus
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(TreatmentStatus $attemptstatus)
+    public function destroy(TreatmentStatus $treatmentstatuses)
     {
-        $attemptstatus->delete();
-        return redirect()->route('attemptstatuses.index')->with('success', 'Attempt statuses deleted successfully');
+        $treatmentstatuses->delete();
+        return redirect()->route('treatmentstatuses.index')->with('success', 'Attempt statuses deleted successfully');
     }
 }

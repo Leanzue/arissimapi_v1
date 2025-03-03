@@ -2,6 +2,8 @@
 
 namespace App\Jobs\Treatment;
 
+use App\Events\TreatmentDispatchedEvent;
+use App\Models\TreatmentAttempt\Treatment;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
@@ -10,11 +12,22 @@ class TreatmentJob implements ShouldQueue
     use Queueable;
 
     /**
-     * Create a new job instance.
+     * @var int
      */
-    public function __construct()
+    public $treatment_id;
+
+    /**
+     * Create a new job instance.
+     * @param Treatment $treatment
+     */
+    public function __construct($treatment)
     {
-        //
+        $this->onQueue($treatment->service_class::getQueueName());
+
+        //$treatment->setQueueing();
+        TreatmentDispatchedEvent::dispatch($treatment);
+        //$treatment->treatmentattempt->setQueueing();
+        $this->treatment_id = $treatment->id;
     }
 
     /**
@@ -22,6 +35,11 @@ class TreatmentJob implements ShouldQueue
      */
     public function handle(): void
     {
-        //
+        // Recuperer le Treatment
+        $treatment = Treatment::getById($this->treatment_id);
+        if ($treatment) {
+            // s'il n'est null, on l'execute
+            $treatment->executeTreatment();
+        }
     }
 }

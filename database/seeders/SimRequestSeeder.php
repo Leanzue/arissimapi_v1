@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Sim\Sim;
-use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 use App\Models\SimRequest\SimRequest;
 
@@ -14,6 +13,6 @@ class SimRequestSeeder extends Seeder
      */
     public function run(): void
     {
-        SimRequest::updateOrNew(Sim::find(1),"192.168.1.1", "http://arissimapi.local/api/postresponse","csv");
+        SimRequest::updateOrNew(Sim::find(1),"192.168.1.1", "http://arissimapi.local/api/simresponses","csv");
     }
 }

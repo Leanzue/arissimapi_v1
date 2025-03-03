@@ -9,6 +9,7 @@ use App\Http\Requests\SimRequest\UpdateSimRequestRequest;
 
 class SimRequestController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      */

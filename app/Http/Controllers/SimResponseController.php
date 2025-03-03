@@ -13,7 +13,8 @@ class SimResponseController extends Controller
      */
     public function index()
     {
-        //
+        $simresponse = SimResponse::all();
+        return view('simresponses.index', compact('simresponse'));
     }
 
     /**
@@ -21,7 +22,7 @@ class SimResponseController extends Controller
      */
     public function create()
     {
-        //
+        return view('simresponses.create');
     }
 
     /**
@@ -29,7 +30,12 @@ class SimResponseController extends Controller
      */
     public function store(StoreSimResponseRequest $request)
     {
-        //
+        SimResponse::create([
+            'iccid' => $request->iccid,
+            'status' => $request->status,
+            'status_change_date' => $request->status_change_date,
+            'client_id_request' => $request->client_id_request,
+        ]);
     }
 
     /**

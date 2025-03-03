@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Str;
-use App\Models\RequestStatus;
+use App\Models\SimRequest\RequestStatus;
 use App\Http\Requests\RequestStatus\StoreRequestStatusRequest;
 use App\Http\Requests\RequestStatus\UpdateRequestStatusRequest;
 
@@ -74,7 +74,7 @@ class RequestStatusController extends Controller
 
         $requestStatus->update([
             'priority' => $request->priority,
-            'libellé' => $request->libellé,
+            'libellé' => $request->libelle,
         ]);
 
         return $requestStatuses;

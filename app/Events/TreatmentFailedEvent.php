@@ -12,7 +12,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class TreatmentDispatchedEvent
+class TreatmentFailedEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -27,7 +27,7 @@ class TreatmentDispatchedEvent
      */
     public function __construct($hastreatment) {
         $this->hastreatment = $hastreatment;
-        Log::info("TreatmentDispatchedEvent, " . get_class($hastreatment));
+        Log::info("TreatmentFailedEvent, " . get_class($hastreatment));
     }
 
     /**

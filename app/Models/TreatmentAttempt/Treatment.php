@@ -3,9 +3,10 @@
 namespace App\Models\TreatmentAttempt;
 
 use App\Models\BaseModel;
-use App\Jobs\SimRequestJob;
 use Illuminate\Support\Carbon;
+use App\Contrats\IHasTreatment;
 use App\Contrats\ITreatmentService;
+use App\Jobs\Treatment\TreatmentJob;
 use App\Contrats\IHasTreatmentResult;
 use App\Traits\TreatmentAttempt\HasTreatment;
 use App\Traits\TreatmentAttempt\HasTreatmentResult;
@@ -16,7 +17,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * Class Treatment
  * @package App\Models\TreatmentAttempt
  *
- * @property string $service_class
+ * @property int $id
+ * @property string|ITreatmentService $service_class
  * @property string $libelle_service
  * @property Carbon $date_debut
  * @property Carbon $date_fin
@@ -24,7 +26,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  *
  * @property TreatmentAttempt|null $treatmentattempt
  */
-class Treatment extends BaseModel implements IHasTreatmentResult
+class Treatment extends BaseModel implements IHasTreatmentResult, IHasTreatment
 {
     /** @use HasFactory<\Database\Factories\TreatmentFactory> */
     use HasFactory, HasTreatment, HasTreatmentResult;
@@ -34,7 +36,7 @@ class Treatment extends BaseModel implements IHasTreatmentResult
     /**
      * @var ITreatmentService
      */
-    protected $service;
+    public $service;
 
     #region Validation Rules
     public static function defaultRules()
@@ -136,33 +138,42 @@ class Treatment extends BaseModel implements IHasTreatmentResult
 
     #region Excute Treatment
     public function executeTreatment() {
-
-        // dis
-        SimRequestJob::dispatch($this);
+        // mettre le traitement comme running
+        $this->setRunning();
+        $this->treatmentattempt->setRunning();
 
         // on instancie le service a executer
         $this->service = New $this->service_class();
-
-
 
         // On execute le service
         $result = $this->service->execTreatment($this);
 
         // Setter le statut en fonction du resultat
-        $result->save();
+        //$result->save();
         if ($result->resultat === 0) {
             // aucun traitement
             $this->setWaiting();
+            // Marquer la tentative waiting
+            $this->treatmentattempt->setWaiting();
         } elseif ($result->resultat === 1) {
             // succes traitement
             $this->setSuccess();
+            $this->treatmentattempt->setWaiting();
         } elseif ($result->resultat === -1) {
             // échec traitement
             $this->setFailed();
+            // echec tentative
+            $this->treatmentattempt->setFailed();
         } elseif ($result->resultat === 2) {
             // traitement suspendu
             $this->setSuspended();
+            // Marquer la tentative Suspended
+            $this->treatmentattempt->setSuspended();
         }
+    }
+
+    public function dispatchTreatment() {
+        TreatmentJob::dispatch($this);
     }
     #endregion
 
@@ -173,14 +184,4 @@ class Treatment extends BaseModel implements IHasTreatmentResult
     public static function getById($id) {
         return Treatment::find($id);
     }
-
-
-    /**
-     *
-     */
-    public function setQueueing() {
-        $this->status = 'queueing';
-        $this->save();
-    }
-
 }

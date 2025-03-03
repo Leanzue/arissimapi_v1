@@ -28,6 +28,11 @@ class ExecBatchService implements ITreatmentService
     public static $BATCH_NAME = "execsqlaris.bat";
     public static $BATCH_DELAY_SECONDS = 5;
 
+    public static function getQueueName()
+    {
+        return "batchservice";
+    }
+
     /**
      * @param Treatment $treatment
      * @return TreatmentResult

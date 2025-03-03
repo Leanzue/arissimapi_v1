@@ -22,13 +22,14 @@ return new class extends Migration
             $table->string('code')->comment('genération du code requete');
             $table->string('description')->comment('description de la requête');
             $table->string('client_ip_address')->comment('adresse du client');
+            $table->integer('client_id_request')->comment('id de requete du client');
             $table->string('url_response')->comment('url pour envoie du resultat');
             $table->string('file_prefix')->nullable()->comment('file_prefix');
             $table->string('file_extension')->nullable()->comment('file_extension');
 
-            $table->foreignId('request_status_id')->nullable()
-                ->comment('request_status_reference')
-                ->constrained('request_statuses')->onDelete('set null');
+            $table->foreignId('treatment_status_id')->nullable()
+                ->comment('attempt status reference')
+                ->constrained('treatment_statuses')->onDelete('set null');
 
             $table->foreignId('request_type_id')->nullable()
                 ->comment('request_type reference')
@@ -48,7 +49,7 @@ return new class extends Migration
     public function down(): void
     {
          {    Schema::table($this->table_name, function (Blueprint $table) {
-                $table->dropForeign(['request_status_id']);
+                $table->dropForeign(['treatment_status_id']);
                 $table->dropForeign(['request_type_id']);
                 $table->dropForeign(['sim_id']);
                 $table->dropBaseForeigns();

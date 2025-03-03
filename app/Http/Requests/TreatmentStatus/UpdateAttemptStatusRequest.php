@@ -21,7 +21,7 @@ class UpdateTreatmentStatusRequest extends TreatmentStatusRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-    {     $id = $this->route('attemptstatuses');
+    {     $id = $this->route('treatmentstatuses');
         return  TreatmentStatus::updateRules($id);
     }
 }

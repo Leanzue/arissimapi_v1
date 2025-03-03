@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('sim_responses', function (Blueprint $table) {
             $table->id();
+
+            $table->string('iccid')->comment('iccid');
+            $table->string('status')->comment('status');
+            $table->string('status_change_date')->comment('status_change_date');
+            $table->string('client_id_request')->comment('client_id_request');
+
             $table->timestamps();
         });
     }

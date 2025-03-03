@@ -18,22 +18,20 @@ return new class extends Migration
     public function up(): void
     {
         // Vérifiez si la table n'existe pas avant de la créer
-        if (!Schema::hasTable($this->table_name)) {
-            Schema::create($this->table_name, function (Blueprint $table) {
-                $table->id();
-                $table->uuid('uuid');
+        Schema::create($this->table_name, function (Blueprint $table) {
+            $table->id();
+            $table->uuid('uuid');
 
-                $table->string('name')->comment('status name');
-                $table->string('code', 100)->unique()->comment('status code');
+            $table->string('name')->comment('status name');
+            $table->string('code', 100)->unique()->comment('status code');
 
-                $table->string('style')->default('success')->comment('status style');
-                $table->boolean('is_default')->default(false)->comment('determine whether is the default one.');
-                $table->string('description', 500)->nullable()->comment('status description');
+            $table->string('style')->default('success')->comment('status style');
+            $table->boolean('is_default')->default(false)->comment('determine whether is the default one.');
+            $table->string('description', 500)->nullable()->comment('status description');
 
-                $table->timestamps();
-            });
-            $this->setTableComment($this->table_name, $this->table_comment);
-        }
+            $table->timestamps();
+        });
+        $this->setTableComment($this->table_name, $this->table_comment);
     }
 
     /**

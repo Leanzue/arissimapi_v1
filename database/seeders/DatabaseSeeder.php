@@ -16,11 +16,10 @@ class DatabaseSeeder extends Seeder
 
             $this->call([
                 StatusSeeder::class,
-                RequestStatusSeeder::class,
+                TreatmentStatusSeeder::class,
                 RequestTypeSeeder::class,
                 SimSeeder::class,
                 SimRequestSeeder::class,
-                TreatmentStatusSeeder::class,
                 //TreatmentResultSeeder::class,
                 //TreatmentAttemptSeeder::class,
             ]);

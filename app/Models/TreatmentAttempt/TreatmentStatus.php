@@ -12,9 +12,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 
 /**
- * Class attemptstatuses
+ * Class treatmentstatuses
  * @package App\Models
  *
+ * @property int $id
  * @property string $code
  * @property string $libelle
  * @property string $description
@@ -24,11 +25,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @method static create(string[] $array)
  *
  * @method static Builder waiting()
+ * @method static Builder queueing()
+ * @method static Builder trying()
  * @method static Builder running()
- * @method static Builder suspended()
- * @method static Builder ended()
  * @method static Builder success()
  * @method static Builder failed()
+ * @method static Builder maxfailed()
+ * @method static Builder suspended()
+ * @method static Builder maxsuspended()
  */
 
 
@@ -78,6 +82,16 @@ class TreatmentStatus extends BaseModel
             ->where('code', "waiting");
     }
 
+    public function scopeQueueing($query) {
+        return $query
+            ->where('code', "queueing");
+    }
+
+    public function scopeTrying($query) {
+        return $query
+            ->where('code', "trying");
+    }
+
     public function scopeRunning($query) {
         return $query
             ->where('code', "running");
@@ -86,11 +100,6 @@ class TreatmentStatus extends BaseModel
     public function scopeSuspended($query) {
         return $query
             ->where('code', "suspended");
-    }
-
-    public function scopeEnded($query) {
-        return $query
-            ->where('code', "ended");
     }
 
     public function scopeSuccess($query) {
@@ -113,22 +122,22 @@ class TreatmentStatus extends BaseModel
     /**
      * @return TreatmentStatus|TValue|null
      */
-    public static function getRunningStatus() {
-        return TreatmentStatus::running()->first();
+    public static function getQueueingStatus() {
+        return TreatmentStatus::queueing()->first();
     }
 
     /**
      * @return TreatmentStatus|TValue|null
      */
-    public static function getSuspendedStatus() {
-        return TreatmentStatus::suspended()->first();
+    public static function getTryingStatus() {
+        return TreatmentStatus::trying()->first();
     }
+
     /**
      * @return TreatmentStatus|TValue|null
      */
-    public static function getEndedStatus()
-    {
-        return TreatmentStatus::ended()->first();
+    public static function getRunningStatus() {
+        return TreatmentStatus::running()->first();
     }
 
     /**
@@ -145,6 +154,28 @@ class TreatmentStatus extends BaseModel
     public static function getFailedStatus()
     {
         return TreatmentStatus::failed()->first();
+    }
+
+    /**
+     * @return TreatmentStatus|TValue|null
+     */
+    public static function getMaxFailedStatus()
+    {
+        return TreatmentStatus::maxfailed()->first();
+    }
+
+    /**
+     * @return TreatmentStatus|TValue|null
+     */
+    public static function getSuspendedStatus() {
+        return TreatmentStatus::suspended()->first();
+    }
+
+    /**
+     * @return TreatmentStatus|TValue|null
+     */
+    public static function getMaxSuspendedStatus() {
+        return TreatmentStatus::maxsuspended()->first();
     }
     #endregion
 
