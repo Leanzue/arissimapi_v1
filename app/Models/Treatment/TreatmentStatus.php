@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Models\TreatmentAttempt;
+namespace App\Models\Treatment;
 
 use App\Models\BaseModel;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Concerns\TValue;
-use App\Traits\TreatmentAttempt\HasTreatment;
+use App\Traits\Treatment\HasTreatment;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 

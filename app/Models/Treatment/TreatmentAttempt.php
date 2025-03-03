@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Models\TreatmentAttempt;
+namespace App\Models\Treatment;
 
 use App\Models\User;
 use App\Models\BaseModel;
 use Illuminate\Support\Carbon;
-use App\Contrats\IHasTreatment;
-use App\Models\SimRequest\SimRequest;
 use App\Events\TreatmentSucceedEvent;
+use App\Models\SimRequest\SimRequest;
+use App\Traits\Treatment\HasTreatment;
 use App\Events\TreatmentDispatchedEvent;
-use App\Traits\TreatmentAttempt\HasTreatment;
+use App\Contrats\Treatment\IHasTreatment;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
@@ -71,7 +72,11 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
         return $this->belongsTo(User::class);
     }
 
-    public function simrequest()
+    /**
+     * get Upper Treatment (SimRequest)
+     * @return BelongsTo
+     */
+    public function uppertreatment()
     {
         return $this->belongsTo(SimRequest::class, "sim_request_id");
     }
@@ -113,7 +118,7 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
         ]);
 
          //assignation de la simrequest
-        $new_treatmentattempt->simrequest()->associate($simrequest)->save();
+        $new_treatmentattempt->uppertreatment()->associate($simrequest)->save();
 
         //
         $new_treatmentattempt->setWaiting();
@@ -131,7 +136,7 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
         $this->description = $description;
 
         if (!is_null($simrequest)) {
-            $this->$simrequest()->associate($simrequest);
+            $this->uppertreatment()->associate($simrequest);
         }
         $this->save();
 
@@ -212,7 +217,7 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
                 //-> marquer la tentative comme Failed (Echec de la tentative)
                 $this->setMaxSuspended();
                 //
-                $this->simrequest->setSuspended();
+                $this->uppertreatment->setSuspended();
             } else {
                 //-> sinon Reessayer a nouveau
                 $this->latesttreatment->dispatchTreatment();
@@ -238,7 +243,7 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
             // -> marquer la tentative comme Max-Failed (Echec de la tentative)
             $this->setMaxFailed();
             //marquer la requete comme failed
-            $this->simrequest->subTreatmentFailed($this);
+            $this->uppertreatment->subTreatmentFailed($this);
         } else {
             // -> sinon Reessayer a nouveau
             // $this->setWaiting();
@@ -270,25 +275,20 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
      */
     private function createNewExecBatch()
     {
-        $treatment = Treatment::insertData(ExecBatchService::class, "Exec Batch Service", "Exec Batch Service");
-        $treatment->treatmentattempt()->associate($this)->save();
-
-        return $treatment;
+        return $this->createNewTreatment(ExecBatchService::class, "Exec Batch Service", "Exec Batch Service");
     }
-
     private function createNewImportFile()
     {
-        $treatment = Treatment::insertData(ImportFileService::class, "Import File Servie", "Import File Servie");
-        $treatment->treatmentattempt()->associate($this)->save();
-
-        return $treatment;
+        return $this->createNewTreatment(ImportFileService::class, "Import File Servie", "Import File Servie");
+    }
+    private function createSendResponse()
+    {
+        return $this->createNewTreatment(SendResponseService::class, "Send Response Service", "Send Response Service");
     }
 
-    private
-    function createSendResponse()
-    {
-        $treatment = Treatment::insertData(SendResponseService::class, "Send Response Service", "Send Response Service");
-        $treatment->treatmentattempt()->associate($this)->save();
+    private function createNewTreatment($service_class, $libelle_service, $description) {
+        $treatment = Treatment::insertData($service_class, $libelle_service, $description);
+        $treatment->uppertreatment()->associate($this)->save();
 
         return $treatment;
     }

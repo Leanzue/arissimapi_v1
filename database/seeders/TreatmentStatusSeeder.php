@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\TreatmentAttempt\TreatmentStatus;
+use App\Models\Treatment\TreatmentStatus;
 
 class TreatmentStatusSeeder extends Seeder
 {

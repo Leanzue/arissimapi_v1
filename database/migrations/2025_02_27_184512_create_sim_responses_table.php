@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('iccid')->comment('iccid');
             $table->string('status')->comment('status');
             $table->string('status_change_date')->comment('status_change_date');
-            $table->string('client_id_request')->comment('client_id_request');
+            $table->string('client_key_request')->nullable()->comment('client_key_request');
 
             $table->timestamps();
         });

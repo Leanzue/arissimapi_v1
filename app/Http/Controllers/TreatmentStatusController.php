@@ -2,7 +2,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Str;
-use App\Models\TreatmentAttempt\TreatmentStatus;
+use App\Models\Treatment\TreatmentStatus;
 use App\Http\Requests\TreatmentStatus\StoreTreatmentStatusRequest;
 use App\Http\Requests\TreatmentStatus\UpdateTreatmentStatusRequest;
 

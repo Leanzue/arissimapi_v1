@@ -34,7 +34,7 @@ class SimResponseController extends Controller
             'iccid' => $request->iccid,
             'status' => $request->status,
             'status_change_date' => $request->status_change_date,
-            'client_id_request' => $request->client_id_request,
+            'client_key_request' => $request->client_key_request,
         ]);
     }
 

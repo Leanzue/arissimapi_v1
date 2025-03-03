@@ -1,11 +1,11 @@
 <?php
 
 
-namespace App\Contrats;
+namespace App\Contrats\Treatment;
 
 
-use App\Models\TreatmentAttempt\Treatment;
-use App\Models\TreatmentAttempt\TreatmentResult;
+use App\Models\Treatment\Treatment;
+use App\Models\Treatment\TreatmentResult;
 
 interface ITreatmentService
 {

@@ -41,10 +41,10 @@ class RequestType extends BaseModel
             ]
         );
     }
-    public static function updateRules($id) {
+    public static function updateRules($model) {
         return array_merge(self::defaultRules(),
             [
-                'code' => ['required', 'unique:request_types,code,'.$id.',id'],
+                'code' => ['required', 'unique:request_types,code,'.$model->id.',id'],
             ]
         );
 

@@ -1,21 +1,21 @@
 <?php
 
 
-namespace App\Traits\TreatmentAttempt;
+namespace App\Traits\Treatment;
 
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
-use App\Models\TreatmentAttempt\TreatmentStatus;
+use App\Models\Treatment\TreatmentStatus;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * Trait HasTreatment
- * @package App\Traits\TreatmentAttempt
+ * Trait HasTreatmentStatus
+ * @package App\Traits\Treatment
  *
  * @property TreatmentStatus $treatmentstatus
  */
-trait HasTreatment
+trait HasTreatmentStatus
 {
     /**
      * @return BelongsTo
@@ -133,5 +133,4 @@ trait HasTreatment
         return $this->treatmentstatus->code === TreatmentStatus::getMaxSuspendedStatus()->code;
     }
     #endregion
-
 }

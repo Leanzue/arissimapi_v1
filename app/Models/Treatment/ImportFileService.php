@@ -1,12 +1,12 @@
 <?php
 
 
-namespace App\Models\TreatmentAttempt;
+namespace App\Models\Treatment;
 
 
-use App\Contrats\ITreatmentService;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\SimRequest\SimRequest;
+use App\Contrats\Treatment\ITreatmentService;
 use App\Imports\SimRequestResponseFilesImport;
 
 class ImportFileService implements ITreatmentService
@@ -37,7 +37,7 @@ class ImportFileService implements ITreatmentService
      */
     public function execTreatment($treatment): TreatmentResult
     {
-        $this->simrequest = $treatment->treatmentattempt->simrequest;
+        $this->simrequest = $treatment->uppertreatment->uppertreatment;
         $this->treatment = $treatment;
         $this->treatmentresult = TreatmentResult::createNewResult($treatment, $this->simrequest, "Importation Fichier Reponse");
 

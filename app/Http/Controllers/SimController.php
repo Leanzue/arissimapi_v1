@@ -60,6 +60,9 @@ class SimController extends Controller
 
     /**
      * Update the specified resource in storage.
+     * @param UpdateSimRequest $request
+     * @param Sim $sim
+     * @return Sim
      */
     public function update(UpdateSimRequest $request, Sim $sim)
     {
@@ -76,6 +79,8 @@ class SimController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     * @param Sim $sims
+     * @return
      */
     public function destroy(Sim $sims)
     {

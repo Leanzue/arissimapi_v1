@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\TreatmentStatus;
 
-use App\Models\TreatmentAttempt\TreatmentStatus;
+use App\Models\Treatment\TreatmentStatus;
 use Illuminate\Contracts\Validation\ValidationRule;
 
 class StoreTreatmentStatusRequest extends TreatmentStatusRequest

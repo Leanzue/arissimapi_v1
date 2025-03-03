@@ -3,9 +3,15 @@
 namespace App\Http\Requests\status;
 
 use App\Models\Status;
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\Sim\SimRequest;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class UpdateStatusRequest extends StatusRequest
+/**
+ * Class UpdateStatusRequest
+ * @package App\Http\Requests\status
+ * @property Status $status
+ */
+class UpdateStatusRequest extends SimRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -18,14 +24,11 @@ class UpdateStatusRequest extends StatusRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string,ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
-        // return  Status::updateRules();
-        {
-            $statusId = $this->route('status');
-            return (new \App\Models\Status)->updateRules($statusId);
-        }
+          return  Status::updateRules($this->status);
+
     }
 }

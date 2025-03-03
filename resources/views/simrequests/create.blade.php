@@ -35,8 +35,8 @@
             <input type="text" class="form-control" id="file_prefix" name="file_prefix" required>
         </div>
         <div class="form-group">
-            <label for="client_id_request">Client ID Request</label>
-            <input type="text" class="form-control" id="client_id_request" name="client_id_request" required>
+            <label for="client_key_request">Client ID Request</label>
+            <input type="text" class="form-control" id="client_key_request" name="client_key_request" required>
         </div>
         <div class="form-group">
             <label for="file_extension">File Extension</label>

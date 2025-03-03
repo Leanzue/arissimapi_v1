@@ -1,17 +1,15 @@
 <?php
 
-namespace App\Models\TreatmentAttempt;
+namespace App\Models\Treatment;
 
 use App\Models\BaseModel;
 use Illuminate\Support\Carbon;
-use App\Contrats\IHasTreatment;
-use App\Contrats\ITreatmentService;
 use App\Jobs\Treatment\TreatmentJob;
 use App\Events\TreatmentFailedEvent;
-use App\Contrats\IHasTreatmentResult;
 use App\Events\TreatmentSucceedEvent;
-use App\Traits\TreatmentAttempt\HasTreatment;
-use App\Traits\TreatmentAttempt\HasTreatmentResult;
+use App\Traits\Treatment\HasTreatment;
+use App\Contrats\Treatment\IHasTreatment;
+use App\Contrats\Treatment\ITreatmentService;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -27,10 +25,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property string $description
  *
  */
-class Treatment extends BaseModel implements IHasTreatmentResult, IHasTreatment
+class Treatment extends BaseModel implements IHasTreatment
 {
     /** @use HasFactory<\Database\Factories\TreatmentFactory> */
-    use HasFactory, HasTreatment, HasTreatmentResult;
+    use HasFactory, HasTreatment;
 
     protected $guarded = [];
 
@@ -76,9 +74,10 @@ class Treatment extends BaseModel implements IHasTreatmentResult, IHasTreatment
 
     #region Relationships
     /**
+     * get Upper Treatment (Treatment Attempt)
      * @return BelongsTo
      */
-    public function treatmentattempt()
+    public function uppertreatment()
     {
         return $this->belongsTo(TreatmentAttempt::class,"treatment_attempt_id");
     }
@@ -127,10 +126,10 @@ class Treatment extends BaseModel implements IHasTreatmentResult, IHasTreatment
      */
     public static function updateOrNew($service_class, $libelle_service, $description = "")
     {
-        $treatmentattempt = Treatment::where('service_class', $service_class)->where('description', $description)->first();
+        $treatment = Treatment::where('service_class', $service_class)->where('description', $description)->first();
 
-        if ($treatmentattempt) {
-            return $treatmentattempt->updateOne($service_class, $libelle_service, $description);
+        if ($treatment) {
+            return $treatment->updateOne($service_class, $libelle_service, $description);
         } else {
             return Treatment::insertData($service_class, $libelle_service, $description);
         }
@@ -141,7 +140,7 @@ class Treatment extends BaseModel implements IHasTreatmentResult, IHasTreatment
     public function executeTreatment() {
         // mettre le traitement comme running
         $this->setRunning();
-        $this->treatmentattempt->setRunning();
+        $this->uppertreatment->setRunning();
 
         // on instancie le service a executer
         $this->service = New $this->service_class();
@@ -155,23 +154,23 @@ class Treatment extends BaseModel implements IHasTreatmentResult, IHasTreatment
             // aucun traitement
             $this->setWaiting();
             // Marquer la tentative waiting
-            $this->treatmentattempt->setWaiting();
+            $this->uppertreatment->setWaiting();
         } elseif ($result->resultat === 1) {
             // succes traitement
             $this->setSuccess();
-           // $this->treatmentattempt->setWaiting();
+           // $this->uppertreatment->setWaiting();
             TreatmentSucceedEvent::dispatch($this);
         } elseif ($result->resultat === -1) {
             // échec traitement
             //$this->setFailed();
             // echec tentative
-           // $this->treatmentattempt->setFailed();
+           // $this->uppertreatment->setFailed();
             TreatmentFailedEvent::dispatch($this);
         } elseif ($result->resultat === 2) {
             // traitement suspendu
             $this->setSuspended();
             // Marquer la tentative Suspended
-            $this->treatmentattempt->setSuspended();
+            $this->uppertreatment->setSuspended();
         }
     }
 

@@ -3,6 +3,7 @@
 namespace App\Console\Commands\SimRequest;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 use App\Models\SimRequest\SimRequest;
 
 class SimRequestExecute extends Command
@@ -27,19 +28,19 @@ class SimRequestExecute extends Command
     public function handle()
     {
         // 1. Recuperer les requetes dans le status
-        $waiting_requests = SimRequest::getWaitingRequests();
+        $waiting_requests = SimRequest::getTreatmentsToBeExecuted();
         //dd(count($waiting_requests));
         if (count($waiting_requests) === 0) {
             // retourner un message pour signifier
             $this->error("aucune requete a executer");
-            \Log::info("Aucune Requete a executer !");
+            Log::info("Aucune Requete a executer !");
         } else {
             // 2. Parcour des requetes en vue de:
             foreach ($waiting_requests as $waiting_request){
                 $waiting_request->execRequest();
                 // Ajouter un message de confirmation pour la fin du traitement
-                $this->info("SimRequest exécuté avec succès.");
-                \Log::info("SimRequest exécuté avec succès pour toutes les requêtes a executer.");
+                $this->info("SimRequest (" . $waiting_request->id . ") exécuté avec succès.");
+                Log::info("SimRequest (" . $waiting_request->id . ") exécuté avec succès pour toutes les requêtes a executer.");
             }
         }
     }

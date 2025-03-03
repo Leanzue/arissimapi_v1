@@ -29,22 +29,20 @@ class SimRequestController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * @param StoreSimRequestRequest $request
+     * @return \Illuminate\Container\Container|\Illuminate\Container\TClass|object
      */
     public function store(StoreSimRequestRequest $request)
     {
-        $simRequest = SimRequest::create([
-            'uuid' => Str::uuid()->toString(),
-            'description' => $request->description,
-            'adresse_ip' => $request->adresse_ip,
-            'date'=>$request->date,
-            'code' => $request->code,
-        ]);
+        $simRequest = SimRequest::registerNewRequest($request);
 
         return response($simRequest, 201);
     }
 
     /**
      * Display the specified resource.
+     * @param SimRequest $simRequest
+     * @return SimRequest
      */
     public function show(SimRequest $simRequest)
     {
@@ -61,14 +59,15 @@ class SimRequestController extends Controller
 
     /**
      * Update the specified resource in storage.
+     * @param UpdateSimRequestRequest $request
+     * @param SimRequest $simRequest
+     * @return SimRequest
      */
     public function update(UpdateSimRequestRequest $request, SimRequest $simRequest)
     {
         $simRequest->update([
             'description' => $request->description,
-            'adresse_ip' => $request->adresse_ip,
-            'date' => $request->date,
-            'code' => $request->code,
+            'adresse_ip' => $request->client_ip_address,
         ]);
 
         return $simRequest;
@@ -76,6 +75,9 @@ class SimRequestController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @param SimRequest $simrequests
+     * @return mixed
      */
     public function destroy(SimRequest $simrequests)
     {

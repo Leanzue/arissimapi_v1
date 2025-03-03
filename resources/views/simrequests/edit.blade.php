@@ -39,8 +39,8 @@
             <input type="text" class="form-control" id="file_prefix" name="file_prefix" value="{{ $simRequest->file_prefix }}" required>
         </div>
         <div class="mb-3">
-            <label for="client_id_request" class="form-label">Client ID Request</label>
-            <input type="text" class="form-control" id="client_id_request" name="client_id_request" value="{{ $simRequest->client_id_request }}" required>
+            <label for="client_key_request" class="form-label">Client ID Request</label>
+            <input type="text" class="form-control" id="client_key_request" name="client_key_request" value="{{ $simRequest->client_key_request }}" required>
         </div>
         <div class="mb-3">
             <label for="file_extension" class="form-label">File Extension</label>

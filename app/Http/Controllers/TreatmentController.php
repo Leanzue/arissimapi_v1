@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 
-use App\Models\TreatmentAttempt\Treatment;
+use App\Models\Treatment\Treatment;
 use App\Http\Requests\TreatmentStatus\StoreTreatmentStatusRequest;
 use App\Http\Requests\TreatmentStatus\UpdateTreatmentStatusRequest;
 

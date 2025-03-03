@@ -3,7 +3,7 @@
 
 namespace App\Http\Requests\RequestType;
 
-use App\Models\RequestType;
+use App\Models\SimRequest\RequestType;
 use Illuminate\Foundation\Http\FormRequest;
 
 class  RequestTypeRequest extends FormRequest

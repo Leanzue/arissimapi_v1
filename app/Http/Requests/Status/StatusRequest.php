@@ -3,9 +3,9 @@
 namespace App\Http\Requests\Status;
 
 use App\Models\Status;
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\Sim\SimRequest;
 
-class StatusRequest extends FormRequest
+class StatusRequest extends SimRequest
 {
     /**
      * Determine if the user is authorized to make this request.

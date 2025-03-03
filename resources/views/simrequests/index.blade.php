@@ -54,7 +54,7 @@
                 <td>{{ $simRequest->client_ip_adresse }}</td>
                 <td>{{ $simRequest->url_reponse }}</td>
                 <td>{{ $simRequest->file_prefix }}</td>
-                <td>{{ $simRequest->client_id_request }}</td>
+                <td>{{ $simRequest->client_key_request }}</td>
                 <td>{{ $simRequest->file_extension }}</td>
                 <td class="actions-container">
                     <!-- Bouton pour afficher les détails -->

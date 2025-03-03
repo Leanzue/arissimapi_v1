@@ -5,10 +5,10 @@ namespace App\Listeners;
 use Illuminate\Support\Facades\Log;
 use App\Events\TreatmentFailedEvent;
 use App\Events\TreatmentDispatchedEvent;
-use App\Models\TreatmentAttempt\Treatment;
+use App\Models\Treatment\Treatment;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
-use App\Models\TreatmentAttempt\TreatmentAttempt;
+use App\Models\Treatment\TreatmentAttempt;
 
 class TreatmentFailedListener
 {
@@ -27,14 +27,8 @@ class TreatmentFailedListener
     public function handle(TreatmentFailedEvent $event): void
     {
         Log::info("TreatmentFailedListener: " . get_class($event->hastreatment));
-        $event->hastreatment->setFailed();
 
-        if ( get_class($event->hastreatment) === Treatment::class ) {
-            // Cas de Treatment
-            $event->hastreatment->treatmentattempt->subTreatmentFailed($event->hastreatment);
-        } elseif ( get_class($event->hastreatment) === TreatmentAttempt::class ) {
-            // Cas de TreatmentAttempt
-            $event->hastreatment->simrequest->subTreatmentFailed($event->hastreatment);
-        }
+        $event->hastreatment->setFailed();
+        $event->hastreatment->uppertreatment->subTreatmentFailed($event->hastreatment);
     }
 }

@@ -1,14 +1,14 @@
 <?php
 
 
-namespace App\Models\TreatmentAttempt;
+namespace App\Models\Treatment;
 
 
-use App\Contrats\ITreatmentService;
 use Illuminate\Support\Facades\Http;
 use App\Models\SimRequest\SimRequest;
 use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Http\Client\RequestException;
+use App\Contrats\Treatment\ITreatmentService;
 
 class SendResponseService implements ITreatmentService
 {
@@ -39,7 +39,7 @@ class SendResponseService implements ITreatmentService
      */
     public function execTreatment($treatment): TreatmentResult
     {
-        $this->simrequest = $treatment->treatmentattempt->simrequest;
+        $this->simrequest = $treatment->uppertreatment->uppertreatment;
         $this->treatment = $treatment;
         $this->treatmentresult = TreatmentResult::createNewResult($treatment, $this->simrequest, "Envoi Reponse");
 

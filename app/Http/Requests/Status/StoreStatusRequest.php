@@ -3,10 +3,11 @@
 namespace App\Http\Requests\status;
 
 use App\Models\Status;
+use App\Http\Requests\Sim\SimRequest;
 use Illuminate\Contracts\Validation\ValidationRule;
 
 
-class StoreStatusRequest extends StatusRequest
+class StoreStatusRequest extends SimRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,12 +24,8 @@ class StoreStatusRequest extends StatusRequest
      */
     public function rules(): array
     {
-        return [
-            //
-        ];
-    }
-    public function messages()
-    {
-        return Status::messagesRules();
+
+       return Status::createRules();
+
     }
 }

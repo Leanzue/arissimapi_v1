@@ -3,7 +3,7 @@
 namespace App\Http\Requests\TreatmentResult;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Models\TreatmentAttempt\TreatmentResult;
+use App\Models\Treatment\TreatmentResult;
 
 class UpdateTreatmentResultRequest extends FormRequest
 {

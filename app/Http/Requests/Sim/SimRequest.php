@@ -2,9 +2,19 @@
 
 namespace App\Http\Requests\Sim;
 
-use App\Models\Sim;
+use App\Models\Sim\Sim;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\ValidationRule;
 
+/**
+ * Class SimRequest
+ * @package App\Http\Requests\Sim
+ *
+ * @property string $iccid
+ * @property string $imsi
+ * @property string $puk
+ * @property string $pin
+ */
 class SimRequest extends FormRequest
 {
     /**
@@ -18,7 +28,7 @@ class SimRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {

@@ -2,11 +2,10 @@
 
 namespace App\Http\Requests\Sim;
 
-use App\Models\Sim;
-use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Sim\Sim;
 use \Illuminate\Contracts\Validation\ValidationRule;
 
-class StoreSimRequest extends simRequest
+class StoreSimRequest extends SimRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,6 +23,5 @@ class StoreSimRequest extends simRequest
     public function rules(): array
     {
         return Sim::createRules();
-
     }
 }

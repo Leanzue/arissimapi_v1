@@ -42,7 +42,7 @@
                 <td>{{ $simResponse->iccid }}</td>
                 <td>{{ $simResponse->status }}</td>
                 <td>{{ $simResponse->status_change_date }}</td>
-                <td>{{ $simResponse->client_id_request }}</td>
+                <td>{{ $simResponse->client_key_request }}</td>
                 <td class="actions-container">
                     <!-- Bouton pour afficher les détails -->
                     <a href="{{ route('simresponses.show', $simResponse->id) }}" class="btn btn-info btn-sm">Afficher</a>

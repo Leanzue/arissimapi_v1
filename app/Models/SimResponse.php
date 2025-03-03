@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $iccid
  * @property string $status
  * @property string $status_change_date
- * @property string $client_id_request
+ * @property string $client_key_request
  *
  * @method static SimResponse create(array $array)
  */

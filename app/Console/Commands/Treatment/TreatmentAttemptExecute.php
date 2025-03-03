@@ -3,7 +3,7 @@
 namespace App\Console\Commands\Treatment;
 
 use Illuminate\Console\Command;
-use App\Models\TreatmentAttempt\TreatmentAttempt;
+use App\Models\Treatment\TreatmentAttempt;
 
 class TreatmentAttemptExecute extends Command
 {

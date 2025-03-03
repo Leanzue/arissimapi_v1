@@ -45,10 +45,10 @@ class Sim extends BaseModel
             ]
         );
     }
-    public static function updateRules($id) {
+    public static function updateRules($model) {
         return array_merge(self::defaultRules(),
             [
-                'iccid' => ['required','unique:Sims,iccid,'.$id.',id',],
+                'iccid' => ['required','unique:Sims,iccid,'. $model->id .',id',],
             ]
         );
     }
@@ -82,14 +82,16 @@ class Sim extends BaseModel
      * @param string $imsi
      * @param string $puk
      * @param string|null $pin
+     *
+     * @return Sim|null
      */
-    public static function insertData($iccid,$imsi,$puk,$pin = null)
+    public static function insertData($iccid, $imsi = null, $puk = null, $pin = null)
     {
-        self::create([
+        return self::create([
             'iccid' => $iccid,
-            'imsi' => $imsi,
-            'puk' => $puk,
-            'pin' => $pin,
+            'imsi' => is_null($imsi) ? "" : $imsi,
+            'puk' => is_null($puk) ? "" : $puk,
+            'pin' => is_null($pin) ? "" : $pin,
         ]);
     }
 
@@ -98,9 +100,10 @@ class Sim extends BaseModel
      * @param string $imsi
      * @param string $puk
      * @param string|null $pin
+     *
      * @return $this
      */
-    public function updateOne( $iccid,  $imsi,  $puk,  $pin = null)
+    public function updateOne($iccid, $imsi = null, $puk = null, $pin = null)
     {
         $this->iccid = $iccid;
         $this->imsi = $imsi;
@@ -112,14 +115,22 @@ class Sim extends BaseModel
         return $this;
     }
 
-    public static function updateOrNew( $iccid,$imsi,$puk,$pin = null)
+    /**
+     * @param $iccid
+     * @param null $imsi
+     * @param null $puk
+     * @param null $pin
+     *
+     * @return Sim|null
+     */
+    public static function updateOrNew($iccid, $imsi = null, $puk = null, $pin = null)
     {
-        $sim = Sim::where('iccid', $iccid)->where('imsi',$imsi)->first();
+        $sim = Sim::where('iccid', $iccid)->first();
 
         if ($sim) {
-            return $sim->updateOne($iccid,$imsi,$puk, $pin);
+            return $sim->updateOne($iccid, $imsi, $puk, $pin);
         } else {
-            return Sim::insertData($iccid,$imsi,$puk, $pin);
+            return Sim::insertData($iccid, $imsi, $puk, $pin);
         }
     }
     #endregion

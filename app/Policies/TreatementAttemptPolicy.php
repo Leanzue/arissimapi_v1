@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\Models\TreatmentAttempt;
+use App\Models\Treatment;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 

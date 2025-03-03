@@ -2,7 +2,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\TreatmentAttempt\TreatmentResult;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /** * Class statuses
@@ -44,11 +43,11 @@ class Status extends Model
         ]);
     }
 
-    public static function updateRules($id)
+    public static function updateRules($model)
     {
         return array_merge(self::defaultRules(), [
-            'name' => ['required', 'unique:statuses,name,' . $id . ',id'],
-            'code' => ['required', 'unique:statuses,code,' . $id . ',id'],
+            'name' => ['required', 'unique:statuses,name,' . $model->id . ',id'],
+            'code' => ['required', 'unique:statuses,code,' . $model->id . ',id'],
         ]);
     }
 

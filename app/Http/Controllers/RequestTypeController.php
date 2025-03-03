@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\RequestType;
+
 use Illuminate\Support\Str;
+use App\Models\SimRequest\RequestType;
 use App\Http\Requests\RequestType\StoreRequestTypeRequest;
 use App\Http\Requests\RequestType\UpdateRequestTypeRequest;
 
@@ -28,6 +29,8 @@ class RequestTypeController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * @param StoreRequestTypeRequest $request
+     * @return
      */
     public function store(StoreRequestTypeRequest $request)
     {
@@ -42,6 +45,8 @@ class RequestTypeController extends Controller
 
     /**
      * Display the specified resource.
+     * @param RequestType $requestType
+     * @return RequestType
      */
     public function show(RequestType $requestType)
     {
@@ -50,6 +55,8 @@ class RequestTypeController extends Controller
 
     /**
      * Show the form for editing the specified resource.
+     * @param RequestType $requestTypes
+     * @return \Illuminate\Container\Container|\Illuminate\Container\TClass|object
      */
     public function edit(RequestType $requestTypes)
     {
@@ -58,6 +65,9 @@ class RequestTypeController extends Controller
 
     /**
      * Update the specified resource in storage.
+     * @param UpdateRequestTypeRequest $request
+     * @param RequestType $requestType
+     * @return
      */
     public function update(UpdateRequestTypeRequest $request, RequestType $requestType)
     {

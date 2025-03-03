@@ -3,7 +3,7 @@
 namespace App\Jobs\Treatment;
 
 use App\Events\TreatmentDispatchedEvent;
-use App\Models\TreatmentAttempt\Treatment;
+use App\Models\Treatment\Treatment;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 

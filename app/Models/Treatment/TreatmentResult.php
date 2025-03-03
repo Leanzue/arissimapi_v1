@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Models\TreatmentAttempt;
+namespace App\Models\Treatment;
 
 use App\Models\BaseModel;
 use App\Models\SimRequest\SimRequest;
-use App\Contrats\IHasTreatmentResult;
+use App\Contrats\Treatment\IHasTreatment;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -67,7 +67,7 @@ class TreatmentResult extends BaseModel
     /**
      * The Model which has this Attribute
      *
-     * @return IHasTreatmentResult|MorphTo
+     * @return IHasTreatment|MorphTo
      */
     public function hastreatmentresult()
     {
@@ -115,18 +115,18 @@ class TreatmentResult extends BaseModel
 
     #region Manage Result
     /**
-     * @param IHasTreatmentResult $hastreatmentresult
+     * @param IHasTreatment $hastreatment
      * @param SimRequest $simrequest
      * @param string $libelle_service
      *
      * @return TreatmentResult
      */
-    public static function createNewResult($hastreatmentresult, $simrequest, $libelle_service) {
+    public static function createNewResult($hastreatment, $simrequest, $libelle_service) {
         $resultat = 0;
         $libelle = $libelle_service . " - Requete n° " . $simrequest->id;
         $details = "En cours";
 
-        return $hastreatmentresult->addNewTreatmentresult($resultat, $libelle, $details);
+        return $hastreatment->addNewTreatmentresult($resultat, $libelle, $details);
     }
 
     /**

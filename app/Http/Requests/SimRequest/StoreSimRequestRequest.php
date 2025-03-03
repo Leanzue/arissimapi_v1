@@ -1,9 +1,17 @@
 <?php
 
 namespace App\Http\Requests\SimRequest;
-use App\Models\SimRequest;
+use App\Models\SimRequest\SimRequest;
 use Illuminate\Contracts\Validation\ValidationRule;
 
+/**
+ * Class StoreSimRequestRequest
+ * @package App\Http\Requests\SimRequest
+ *
+ * @property string $iccid
+ * @property string $url_response
+ * @property string|null $client_key_request
+ */
 class StoreSimRequestRequest extends SimRequestRequest
 {
     /**
@@ -21,7 +29,6 @@ class StoreSimRequestRequest extends SimRequestRequest
      */
     public function rules(): array
     {
-        return [];
-        // SimRequest::createRules();
+        return SimRequest::createRules();
     }
 }

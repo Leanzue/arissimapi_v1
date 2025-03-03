@@ -5,14 +5,16 @@ namespace App\Models\SimRequest;
 use App\Models\Sim\Sim;
 use App\Models\BaseModel;
 use App\Traits\Code\HasCode;
-use App\Contrats\IHasTreatment;
+use App\Contrats\Treatment\IHasTreatment;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
-use App\Models\TreatmentAttempt\Treatment;
-use App\Traits\TreatmentAttempt\HasTreatment;
-use App\Models\TreatmentAttempt\TreatmentStatus;
-use App\Models\TreatmentAttempt\TreatmentAttempt;
+use App\Models\Treatment\Treatment;
+use App\Traits\Treatment\HasTreatment;
+use App\Models\Treatment\TreatmentStatus;
+use App\Models\Treatment\TreatmentAttempt;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Http\Requests\SimRequest\StoreSimRequestRequest;
 
 
 /**
@@ -30,9 +32,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  *
  * @property string|null $file_prefix
  * @property string|null $file_extension
- * @property int| $client_id_request
+ * @property string|null $client_key_request
  *
- * @property RequestStatus $requeststatuses
  * @property RequestType $requestTypes
  * @property Sim $sim
  * @property-read string|null $response_file_name
@@ -46,11 +47,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property Treatment $currenttreatment
  */
 
-class SimRequest extends BaseModel
+class SimRequest extends BaseModel implements IHasTreatment
 {
     public static $REQRESPONSE_FOLDER_CONFIG_DIR = "reqresponse_folder";
     public static $REQRESPONSE_FILE_KEY= "_res";
     pUBLIC static $MAX_ATTEMPTS_FAILED_RETRY = 5 ;
+    pUBLIC static $FILE_EXTENSION = "csv" ;
 
 
     /** @use HasFactory<\Database\Factories\SimRequestFactory> */
@@ -63,8 +65,6 @@ class SimRequest extends BaseModel
     public static function defaultRules()
     {
         return [
-            'description' => 'required|string',
-            'code' => 'required|string',
         ];
     }
 
@@ -72,31 +72,23 @@ class SimRequest extends BaseModel
     {
         return array_merge(self::defaultRules(),
             [
-              'description' => ['required', 'unique:Sim_requests,NULL,id',],
-              'code' => ['required', 'unique:Sim_requests,NULL,id',],
+                'iccid' => 'required|string',
+                'url_response' => 'required|string',
             ]
         );
     }
 
-    public static function updateRules($id)
+    public static function updateRules($model)
     {
-        return array_merge(self::defaultRules(),
-            [
-              'description' => ['required', 'unique:Sim_requests,' . $id . ',id',],
-              'code' => ['required', 'unique:Sim_requests,' . $id . ',id',],
-            ]
+        return array_merge(self::defaultRules(), []
         );
     }
 
     public static function messagesRules()
     {
         return [
-            'description.required' => "Le champs description est obligatoire",
-            'description.string' => "Le champs  description doit etre une chaine de caracteres",
-            'date.required' => "Le champs date est obligatoire",
-            'date.string' => "Le champs  date doit etre une chaine de caracteres",
-            'code.required' => "Le champs code est obligatoire",
-            'code.string' => "Le champs  priority doit etre une chaine de caracteres",
+            'iccid.required' => "Le champs iccid est obligatoire",
+            'url_response.required' => "Le champs url_response est obligatoire",
         ];
     }
     #endregion validation rules
@@ -152,6 +144,11 @@ class SimRequest extends BaseModel
         return $this->hasOne(TreatmentAttempt::class, 'sim_request_id')->ofMany('id', 'max');
     }
 
+    public function uppertreatment()
+    {
+        return null;
+    }
+
     /**
      * @return Treatment|null
      */
@@ -174,9 +171,13 @@ class SimRequest extends BaseModel
     /**
      * @return SimRequest[]|null
      */
-    public static function getWaitingRequests()
+    public static function getTreatmentsToBeExecuted()
     {
-        return SimRequest::where('treatment_status_id', TreatmentStatus::getWaitingStatus()->id)->get();
+        return SimRequest::
+        where('treatment_status_id', TreatmentStatus::getWaitingStatus()->id)
+            ->OrWhere('treatment_status_id', TreatmentStatus::getFailedStatus()->id)
+            ->OrWhere('treatment_status_id', TreatmentStatus::getSuspendedStatus()->id)
+            ->get();
     }
 
     /**
@@ -190,21 +191,37 @@ class SimRequest extends BaseModel
     #region Insert & Update
 
     /**
+     * @param StoreSimRequestRequest $request
+     * @return SimRequest
+     */
+    public static function registerNewRequest($request) {
+        $iccid = $request->iccid;
+        $url_response = $request->url_response;
+        $client_key_request = $request->client_key_request;
+        $client_ip_address = $request->ip();
+        $file_extension = self::$FILE_EXTENSION;
+
+        $sim = Sim::updateOrNew($iccid);
+
+        return self::insertData($sim, $client_ip_address, $url_response, $file_extension, "", $client_key_request);
+    }
+
+    /**
      * @param Sim $sim
      * @param string $client_ip_address
      * @param string $url_response
      * @param string $file_extension
      * @param string $file_prefix
-     * @param string $client_id_request
+     * @param string $client_key_request
      * @param string $description
      * @param RequestType|null $request_type
      * @return SimRequest
      */
-    public static function insertData($sim, $client_ip_address, $url_response, $file_extension, $file_prefix = "", $client_id_request = -1, $description = "", $request_type = null)
+    public static function insertData($sim, $client_ip_address, $url_response, $file_extension, $file_prefix = "", $client_key_request = "", $description = "", $request_type = null)
     {
         $new_simrequest = self::create([
             'client_ip_address' => $client_ip_address,
-            'client_id_request' => $client_id_request,
+            'client_key_request' => $client_key_request,
             'url_response' => $url_response,
             'file_prefix' => $file_prefix,
             'file_extension' => $file_extension,
@@ -239,16 +256,16 @@ class SimRequest extends BaseModel
      * @param string $url_response
      * @param string $file_extension
      * @param string $file_prefix
-     * @param int $client_id_request
+     * @param string|null $client_key_request
      * @param string $description
      * @param RequestType|null $request_type
      * @return $this
      */
-    public function updateOne($sim, $client_ip_address, $url_response, $file_extension, $file_prefix = "", $client_id_request = -1, $description = "", $request_type = null)
+    public function updateOne($sim, $client_ip_address, $url_response, $file_extension, $file_prefix = "", $client_key_request = "", $description = "", $request_type = null)
     {
         $this->description = $description;
         $this->client_ip_address = $client_ip_address;
-        $this->client_id_request = $client_id_request;
+        $this->client_key_request = $client_key_request;
         $this->url_response = $url_response;
         $this->file_extension = $file_extension;
         $this->file_prefix = $file_prefix;
@@ -271,19 +288,19 @@ class SimRequest extends BaseModel
      * @param string $url_response
      * @param string $file_extension
      * @param string $file_prefix
-     * @param string $client_id_request
+     * @param string|null $client_key_request
      * @param string $description
      * @param RequestType|null $request_type
      * @return SimRequest
      */
-    public static function updateOrNew($sim, $client_ip_address, $url_response, $file_extension, $file_prefix = "", $client_id_request = -1, $description = "", $request_type = null)
+    public static function updateOrNew($sim, $client_ip_address, $url_response, $file_extension, $file_prefix = "", $client_key_request = "", $description = "", $request_type = null)
     {
         $simrequest = SimRequest::where('sim_id', $sim->id)->where('client_ip_address',$client_ip_address)->first();
 
         if ($simrequest) {
-            return $simrequest->updateOne($sim, $client_ip_address,$url_response, $file_extension, $file_prefix,$client_id_request , $description, $request_type);
+            return $simrequest->updateOne($sim, $client_ip_address,$url_response, $file_extension, $file_prefix,$client_key_request , $description, $request_type);
         } else {
-            return SimRequest::insertData($sim, $client_ip_address, $url_response, $file_extension, $file_prefix,$client_id_request , $description, $request_type);
+            return SimRequest::insertData($sim, $client_ip_address, $url_response, $file_extension, $file_prefix,$client_key_request , $description, $request_type);
         }
     }
     #endregion
@@ -369,5 +386,4 @@ class SimRequest extends BaseModel
             }
         });
     }
-
 }

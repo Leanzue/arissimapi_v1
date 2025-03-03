@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
-use App\Models\TreatmentAttempt\TreatmentResult;
+use App\Models\Treatment\TreatmentResult;
 
 class TreatmentResultSeeder extends Seeder
 {

@@ -2,13 +2,16 @@
 
 namespace App\Http\Requests\RequestType;
 
-use App\Models\RequestType;
-use Illuminate\Foundation\Http\FormRequest;
+
+
+use App\Http\Requests\Sim\SimRequest;
+use App\Models\SimRequest\RequestType;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 /**
- * @property mixed $Action
+ * @property RequestType $requesttype
  */
-class UpdateRequestTypeRequest extends FormRequest
+class UpdateRequestTypeRequest extends SimRequest
 {
     /**
      * @var mixed
@@ -24,10 +27,10 @@ class UpdateRequestTypeRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string,ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-    {     $id = $this->route('requesttype');
-        return RequestType::updateRules($id);
+    {
+        return RequestType::updateRules($this->requesttype);
     }
 }

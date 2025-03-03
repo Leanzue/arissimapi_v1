@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('code')->comment('genération du code requete');
             $table->string('description')->comment('description de la requête');
             $table->string('client_ip_address')->comment('adresse du client');
-            $table->integer('client_id_request')->comment('id de requete du client');
+            $table->string('client_key_request')->nullable()->comment('cle de requete du client');
             $table->string('url_response')->comment('url pour envoie du resultat');
             $table->string('file_prefix')->nullable()->comment('file_prefix');
             $table->string('file_extension')->nullable()->comment('file_extension');

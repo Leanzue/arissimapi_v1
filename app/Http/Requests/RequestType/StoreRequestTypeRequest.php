@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\RequestType;
 
-use App\Models\RequestType;
+use App\Models\SimRequest\RequestType;
 use Illuminate\Contracts\Validation\ValidationRule;
 
 

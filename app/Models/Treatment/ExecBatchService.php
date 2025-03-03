@@ -1,11 +1,11 @@
 <?php
 
 
-namespace App\Models\TreatmentAttempt;
+namespace App\Models\Treatment;
 
-use App\Contrats\ITreatmentService;
 use App\Models\SimRequest\SimRequest;
 use Illuminate\Support\Facades\Process;
+use App\Contrats\Treatment\ITreatmentService;
 
 class ExecBatchService implements ITreatmentService
 {
@@ -39,7 +39,7 @@ class ExecBatchService implements ITreatmentService
      */
     public function execTreatment($treatment): TreatmentResult
     {
-        $this->simrequest = $treatment->treatmentattempt->simrequest;
+        $this->simrequest = $treatment->uppertreatment->uppertreatment;
         $this->treatment = $treatment;
         $this->treatmentresult = TreatmentResult::createNewResult($treatment, $this->simrequest, "Execution Batch");
 

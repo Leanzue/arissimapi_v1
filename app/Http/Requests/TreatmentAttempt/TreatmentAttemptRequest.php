@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\TreatmentAttempt;
 
-use App\Models\TreatmentAttempt;
+use App\Models\Treatment;
 use Illuminate\Foundation\Http\FormRequest;
 
 class TreatmentAttemptRequest extends FormRequest

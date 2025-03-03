@@ -30,8 +30,8 @@
             <input type="text" class="form-control" id="status_change_date" name="status_change_date" value="{{ $simResponse->status_change_date }}" required>
         </div>
         <div class="form-group">
-            <label for="client_id_request">Client ID Request</label>
-            <input type="text" class="form-control" id="client_id_request" name="client_id_request" value="{{ $simResponse->client_id_request }}" required>
+            <label for="client_key_request">Client ID Request</label>
+            <input type="text" class="form-control" id="client_key_request" name="client_key_request" value="{{ $simResponse->client_key_request }}" required>
         </div>
         <button type="submit" class="btn btn-primary">Enregistrer</button>
     </form>

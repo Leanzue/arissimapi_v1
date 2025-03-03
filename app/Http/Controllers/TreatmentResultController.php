@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Str;
-use App\Models\TreatmentAttempt\TreatmentResult;
+use App\Models\Treatment\TreatmentResult;
 use App\Http\Requests\TreatmentResult\StoreTreatmentResultRequest;
 use App\Http\Requests\TreatmentResult\UpdateTreatmentResultRequest;
 

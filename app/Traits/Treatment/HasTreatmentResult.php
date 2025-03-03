@@ -1,9 +1,9 @@
 <?php
 
 
-namespace App\Traits\TreatmentAttempt;
+namespace App\Traits\Treatment;
 
-use App\Models\TreatmentAttempt\TreatmentResult;
+use App\Models\Treatment\TreatmentResult;
 
 /**
  * Trait HasTreatmentResult

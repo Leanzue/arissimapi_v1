@@ -1,25 +1,28 @@
 <?php
 
 
-namespace App\Contrats;
+namespace App\Contrats\Treatment;
 
-use App\Models\SimRequest\SimRequest;
-use App\Models\TreatmentAttempt\TreatmentAttempt;
+
+use App\Models\Treatment\TreatmentStatus;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * Interface IHasTreatment
- * @package App\Contrats
+ * Interface IHasTreatmentStatus
+ * @package App\Contrats\Treatment
  *
- * @property TreatmentAttempt|null $treatmentattempt
- * @property SimRequest|null $simrequest
- *
- * @method treatmentresults(): morphMany
+ * @property TreatmentStatus|null $treatmentstatus
  */
-interface IHasTreatment
+interface IHasTreatmentStatus
 {
-    //
+    #region Relationships
+    /**
+     * @return belongsTo
+     */
     public function treatmentstatus();
-    #region Treatment Status Management
+    #endregion
+
+    #region Status Setters
     public function setStart();
     public function setEnded();
     public function setWaiting();
@@ -31,8 +34,9 @@ interface IHasTreatment
     public function setMaxFailed();
     public function setSuspended();
     public function setMaxSuspended();
+    #endregion
 
-    // Les Etats
+    #region Status States
     public function isWaiting();
     public function isQueueing();
     public function isTrying();
@@ -42,8 +46,9 @@ interface IHasTreatment
     public function isMaxFailed();
     public function isSuspended();
     public function isMaxSuspended();
+    #endregion
 
-    //
+    #region Sub-Treatment Status
     /**
      * @param IHasTreatment $subtreatment
      */
@@ -58,4 +63,5 @@ interface IHasTreatment
      * @param IHasTreatment $subtreatment
      */
     public function subTreatmentSucceed($subtreatment);
+    #endregion
 }

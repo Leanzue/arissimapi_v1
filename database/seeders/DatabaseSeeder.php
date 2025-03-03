@@ -18,8 +18,8 @@ class DatabaseSeeder extends Seeder
                 StatusSeeder::class,
                 TreatmentStatusSeeder::class,
                 RequestTypeSeeder::class,
-                SimSeeder::class,
-                SimRequestSeeder::class,
+                //SimSeeder::class,
+                //SimRequestSeeder::class,
                 //TreatmentResultSeeder::class,
                 //TreatmentAttemptSeeder::class,
             ]);
