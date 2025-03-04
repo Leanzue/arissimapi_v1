@@ -28,7 +28,7 @@ class SimRequestExecute extends Command
      */
     public function handle()
     {
-        Treatment::find(1)->endTreatmentWithSuccess();
+       // Treatment::find(1)->endTreatmentWithSuccess();
         // 1. Recuperer les requetes dans le status
         $waiting_requests = SimRequest::getTreatmentsToBeExecuted();
         //dd(count($waiting_requests));
