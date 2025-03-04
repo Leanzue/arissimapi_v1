@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\SimResponse;
-use App\Http\Requests\StoreSimResponseRequest;
-use App\Http\Requests\UpdateSimResponseRequest;
+use App\Http\Requests\SimResponse\StoreSimResponseRequest;
+use App\Http\Requests\SimResponse\UpdateSimResponseRequest;
 
 class SimResponseController extends Controller
 {
@@ -27,6 +27,7 @@ class SimResponseController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * @param StoreSimResponseRequest $request
      */
     public function store(StoreSimResponseRequest $request)
     {

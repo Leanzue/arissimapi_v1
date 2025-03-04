@@ -37,13 +37,13 @@ class SendResponseService implements ITreatmentService
      * @param Treatment $treatment
      * @return TreatmentResult
      */
-    public function execTreatment($treatment): TreatmentResult
+    public function execService($treatment): TreatmentResult
     {
         $this->simrequest = $treatment->uppertreatment->uppertreatment;
         $this->treatment = $treatment;
         $this->treatmentresult = TreatmentResult::createNewResult($treatment, $this->simrequest, "Envoi Reponse");
 
-        if ( $this->checkInputs() ) {
+        if ( $this->checkRequiredInputs() ) {
             try {
                 $response = Http::post($this->simrequest->url_response, [
                     'iccid' => $this->simrequest->latestresponsefile->iccid,
@@ -51,32 +51,32 @@ class SendResponseService implements ITreatmentService
                     'status_change_date' => $this->simrequest->latestresponsefile->status_change_date_str,
                 ]);
 
-                $this->treatmentresult->setSuccess();
+                $this->treatment->endTreatmentWithSuccess();
             } catch (ConnectException $e) {
-                $this->treatmentresult->setFailed("status: " . 404 . "; msg: " . $e->getMessage());
+                $this->treatment->endTreatmentWithFailure("status: " . 404 . "; msg: " . $e->getMessage());
             } catch (RequestException $e) {
-                $this->treatmentresult->setFailed("status: " . $e->getResponse()->getStatusCode() . "; msg: " . $e->getMessage());
+                $this->treatment->endTreatmentWithFailure("status: " . $e->getResponse()->getStatusCode() . "; msg: " . $e->getMessage());
             } catch (\Exception $e) {
-                $this->treatmentresult->setFailed($e->getMessage());
+                $this->treatment->endTreatmentWithFailure($e->getMessage());
             }
         }
         return $this->treatmentresult;
     }
 
-    private function checkInputs() {
+    private function checkRequiredInputs() {
 
         if (! $this->simrequest) {
-            $this->treatmentresult->setFailed("Requete non renseigne");
+            $this->treatment->endTreatmentWithFailure("Requete non renseigne");
             return false;
         }
 
         if (! $this->simrequest->url_response) {
-            $this->treatmentresult->setFailed("URL Reponse non renseignee");
+            $this->treatment->endTreatmentWithFailure("URL Reponse non renseignee");
             return false;
         }
 
         if (! $this->simrequest->latestresponsefile) {
-            $this->treatmentresult->setFailed("Objet FICHIER non existant");
+            $this->treatment->endTreatmentWithFailure("Objet FICHIER non existant");
             return false;
         }
 

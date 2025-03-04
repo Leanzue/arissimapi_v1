@@ -19,6 +19,8 @@ return new class extends Migration
 
             $table->integer('resultat')->default(0)->Comment('le resultat: 0 = aucun, 1 = succeès, -1 = echec');
             $table->string('libelle')->default("aucun")->Comment('libelle du resultat');
+            $table->timestamp('date_debut')->nullable()->comment('date de debut du traitement');
+            $table->timestamp('date_fin')->nullable()->comment('date de fin du traitement');
             $table->string('details')->comment('string description du resultat de traitement');
             $table->integer('posi')->comment('position du resultat de traitement parmi tous les resultats du model');
 

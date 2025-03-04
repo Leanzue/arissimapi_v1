@@ -5,14 +5,14 @@ namespace App\Models\SimRequest;
 use App\Models\Sim\Sim;
 use App\Models\BaseModel;
 use App\Traits\Code\HasCode;
-use App\Events\TreatmentDispatchedEvent;
-use App\Contrats\Treatment\IHasTreatment;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
-use App\Models\Treatment\Treatment;
 use App\Traits\Treatment\HasTreatment;
 use App\Models\Treatment\TreatmentStatus;
+use App\Contrats\Treatment\IHasTreatment;
 use App\Models\Treatment\TreatmentAttempt;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Http\Requests\SimRequest\StoreSimRequestRequest;
@@ -40,12 +40,12 @@ use App\Http\Requests\SimRequest\StoreSimRequestRequest;
  * @property-read string|null $response_file_name
  *
  * @method static SimRequest create(string[] $array)
- * @method static find(int $id)
+ * @method static SimRequest|null find(int $id)
  * @property SimRequestResponseFile $latestresponsefile
  * @property TreatmentAttempt[] $treatmentattempts
  * @property TreatmentAttempt $latesttreatmentattempt
  *
- * @property Treatment $currenttreatment
+ * @property bool $is_batch_response_file_exists
  */
 
 class SimRequest extends BaseModel implements IHasTreatment
@@ -112,86 +112,95 @@ class SimRequest extends BaseModel implements IHasTreatment
 
         return base_path($folder) . DIRECTORY_SEPARATOR . $filename;
     }
+
+    /**
+     * @return bool
+     */
+    public function getIsBatchResponseFileExistsAttribute()
+    {
+        return File::exists($this->response_file_name);
+    }
     #endregion
 
     #region Relationships
+    /**
+     * retourne le type de requete|la relation eloquent.
+     * @return BelongsTo
+     */
     public function requesttype()
     {
         return $this->belongsTo(RequestType::class, 'request_type_id');
     }
 
+    /**
+     * retourne la sim de la requete|la relation eloquent.
+     * @return BelongsTo
+     */
     public function sim()
     {
         return $this->belongsTo(Sim::class, 'sim_id');
     }
 
+    /**
+     *  retourne les fichiers reponses de la requete|la relation eloquent.
+     * @return HasMany
+     */
     public function responsefiles()
     {
         return $this->hasMany(SimRequestResponseFile::class, 'sim_request_id');
     }
 
+    /**
+     *  retourne le dernier fichier reponse de la requete|la relation eloquent.
+     * @return HasOne
+     */
     public function latestresponsefile()
     {
         return $this->hasOne(SimRequestResponseFile::class, 'sim_request_id')->ofMany('id', 'max');
     }
 
+    /**
+     * retourne les tentatives de traitement de la requete|la relation eloquent.
+     * @return HasMany
+     */
     public function treatmentattempts()
     {
         return $this->hasMany(TreatmentAttempt::class, 'sim_request_id');
     }
 
+    /**
+     * retourne la dernière tentative de traitement de la requete|la relation eloquent.
+     * @return HasOne
+     */
     public function latesttreatmentattempt()
     {
         return $this->hasOne(TreatmentAttempt::class, 'sim_request_id')->ofMany('id', 'max');
     }
 
+    /**
+     * retourne le traitement supérieur/parent de la requete|la relation eloquent.
+     * @return BelongsTo|null
+     */
     public function uppertreatment()
     {
         return null;
     }
 
-    /**
-     * @return Treatment|null
-     */
-    public function getCurrenttreatmentAttribute() {
-        if (! $this->latesttreatmentattempt) {
-            return null;
-        }
-        return $this->latesttreatmentattempt->latesttreatment;
-    }
     #endregion
 
-    /**
-     * @return bool
-     */
-    public function isBatchResponseFileExists()
-    {
-        return File::exists($this->response_file_name);
-    }
+    #region Insert & Update
 
     /**
-     * @return SimRequest[]|null
-     */
-    public static function getTreatmentsToBeExecuted()
-    {
-        return SimRequest::
-        where('treatment_status_id', TreatmentStatus::getWaitingStatus()->id)
-            ->OrWhere('treatment_status_id', TreatmentStatus::getFailedStatus()->id)
-            ->OrWhere('treatment_status_id', TreatmentStatus::getSuspendedStatus()->id)
-            ->get();
-    }
-
-    /**
+     * retoune une requete sim à partir de son ID
      * @param $id
-     * @return mixed
+     * @return SimRequest|null
      */
     public static function getById($id){
         return SimRequest::find($id);
     }
 
-    #region Insert & Update
-
     /**
+     * enregistre une requete à partir de l'api
      * @param StoreSimRequestRequest $request
      * @return SimRequest
      */
@@ -208,6 +217,7 @@ class SimRequest extends BaseModel implements IHasTreatment
     }
 
     /**
+     * Insert un nouvel objet SimRequest dans la base de données
      * @param Sim $sim
      * @param string $client_ip_address
      * @param string $url_response
@@ -252,6 +262,7 @@ class SimRequest extends BaseModel implements IHasTreatment
         }
 
     /**
+     * Modifie un objet SimRequest à partir de la base de données
      * @param Sim $sim
      * @param string $client_ip_address
      * @param string $url_response
@@ -284,6 +295,7 @@ class SimRequest extends BaseModel implements IHasTreatment
     }
 
     /**
+     * Modifie ou insert  un objet SimRequest dans la base de données
      * @param sim $sim
      * @param string $client_ip_address
      * @param string $url_response
@@ -306,7 +318,7 @@ class SimRequest extends BaseModel implements IHasTreatment
     }
     #endregion
 
-    #region hascode
+    #region implémentation de HasCode
     protected function getCodeSeparator()
     {
         return "";
@@ -315,12 +327,36 @@ class SimRequest extends BaseModel implements IHasTreatment
 
     #region Excute Request
 
+    /**
+     * retourne les requetes qui peuvent etre exécutés
+     * @return SimRequest[]|null
+     */
+    public static function getTreatmentsToBeExecuted()
+    {
+        return SimRequest::
+        where('treatment_status_id', TreatmentStatus::getWaitingStatus()->id)
+            ->OrWhere('treatment_status_id', TreatmentStatus::getFailedStatus()->id)
+            ->OrWhere('treatment_status_id', TreatmentStatus::getSuspendedStatus()->id)
+            ->get();
+    }
+
+    /**
+     * Exécute la requete
+     */
     public function execRequest()
     {
         // S'il n'y a pas de tentative,
         if ($this->treatmentattempts()->count() === 0) {
             // Creer une nouvelle
             $this->startNewAttempt();
+
+            return;
+        }
+
+        // si la derniere tentative est en attente
+        if ($this->latesttreatmentattempt->isWaiting()) {
+            // L'exécuter
+            $this->latesttreatmentattempt->executeAttempt();
             return;
         }
 
@@ -335,35 +371,43 @@ class SimRequest extends BaseModel implements IHasTreatment
             $this->subTreatmentStatusChanged($this->latesttreatmentattempt);
         }
     }
+    #endregion
 
-     public function subTreatmentStatusChanged($subtreatment)
-    {
-        if ( $subtreatment->isQueueing() ) {
-            TreatmentDispatchedEvent::dispatch($this);
+    #region Status Management
+    /**
+     * le statut d'un sous-traitement (Tentative) à changé
+     * @param IHasTreatment|TreatmentAttempt $subtreatment
+     */
+    public function subTreatmentStatusChanged($subtreatment) {
+        if ( $subtreatment->isWaiting() ) {
+            $this->setWaiting();
+        } elseif ( $subtreatment->isQueueing() ) {
+            $this->setQueueing();
         } elseif ( $subtreatment->isRunning() ) {
-            // TODO dd
+            $this->setRunning();
         } elseif ( $subtreatment->isSuccess() ) {
             $this->subTreatmentSucceed($subtreatment);
         } elseif ( $subtreatment->isFailed() ) {
             $this->subTreatmentFailed($subtreatment);
+        } elseif ($subtreatment->isMaxFailed() ) {
+            $this->subTreatmentFailed($subtreatment);
+        } elseif ($subtreatment->isSuspended() ) {
+            $this->subTreatmentSuspended($subtreatment);
+        } elseif ($subtreatment->isMaxSuspended() ) {
+            $this->subTreatmentMaxSuspended($subtreatment);
         }
     }
 
     /**
      * @param IHasTreatment $subtreatment
      */
-    public function subTreatmentDispatched($subtreatment) {
-        $this->setQueueing();
-    }
-
-    /**
-     * @param IHasTreatment $subtreatment
-     */
-    public function subTreatmentFailed($subtreatment) {
+    private function subTreatmentFailed($subtreatment) {
         //-> ressayer si le nombre maximal de tentative est atteint
         if ($this->treatmentattempts()->count() >= self::$MAX_ATTEMPTS_FAILED_RETRY ) {
             // Marquer le requete comme failed
             $this->setMaxFailed();
+
+            $this->subtreatmentEndWithFailure($subtreatment);
         } else {
             // sinon, Reessayer
             $this->startNewAttempt();
@@ -371,21 +415,65 @@ class SimRequest extends BaseModel implements IHasTreatment
     }
 
     /**
+     *le status :en succès
      * @param IHasTreatment $subtreatment
      */
-    public function subTreatmentSucceed($subtreatment) {
+    private function subTreatmentSucceed($subtreatment)
+    {
         // Marquer la requete comme success
         $this->setSuccess();
+
+        // fin de la tentative de traitement
+        $this->endTreatmentWithSuccess();
     }
+
+    /**
+     * le status :en suspension
+     * @param IHasTreatment $subtreatment
+     */
+    private function subTreatmentSuspended ($subtreatment)
+    {
+        //-> ressayer si le nombre maximal de tentative est atteint
+        if ($this->treatmentattempts()->count() >= self::$MAX_ATTEMPTS_FAILED_RETRY) {
+            // Marquer le requete comme suspended
+            $this->setMaxsuspended();
+
+            $this->subtreatmentEndWithFailure($subtreatment);
+        } else {
+            // sinon, Reessayer
+            $this->startNewAttempt();
+        }
+
+    }
+    /**
+     * * le status :en suspension
+     * @param $subtreatment
+     */
+    private function subTreatmentMaxSuspended($subtreatment)
+    {
+        // Marquer la requete comme suspended
+        $this->setMaxSuspended();
+    }
+
+    /**
+     * @param IHasTreatment|TreatmentAttempt $subtreatment
+     */
+    private function subtreatmentEndWithFailure($subtreatment) {
+        $attempt_no = $this->treatmentattempts()->count() + 1;
+        // fin de la tentative de traitement
+        $this->endTreatmentWithFailure("Echec Traitement, Tentative N° " . $attempt_no . " (" . $subtreatment->id . ")");
+    }
+
+
 
     private function startNewAttempt() {
         $attempt_no = $this->treatmentattempts()->count() + 1;
         $treatmentattempt = TreatmentAttempt::insertData($this, "Tentative Execution N° " . $attempt_no);
         $treatmentattempt->executeAttempt();
-        //$this->setTrying();
+
+        // Creéer le Resultat de la Tentative
+        $this->startTreatment("Execution Requête (" . $this->id . ") - Tentative N° " . $attempt_no);
     }
-
-
     #endregion
 
     public static function boot()

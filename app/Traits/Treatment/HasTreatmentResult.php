@@ -3,6 +3,7 @@
 
 namespace App\Traits\Treatment;
 
+use Illuminate\Support\Carbon;
 use App\Models\Treatment\TreatmentResult;
 
 /**
@@ -24,7 +25,7 @@ trait HasTreatmentResult
 
     public function firstTreatmentResult()
     {
-        return $this->morphOne(TreatmentResult::class, 'hastreatmentresult')->ofMany('posi', 'min');
+        return $this->morphOne(TreatmentResult::class, 'hastreatmentresult')->oldest('posi');
     }
     public function latestTreatmentResult()
     {
@@ -34,6 +35,37 @@ trait HasTreatmentResult
     public function oldestTreatmentResult()
     {
         return $this->morphOne(TreatmentResult::class, 'hastreatmentresult')->oldest('id');
+    }
+
+    /**
+     * @param $libelle
+     * @param string $details
+     * @return TreatmentResult|null
+     */
+    public function startTreatment($libelle, $details = "En cours") : TreatmentResult {
+        $newresult = $this->addNewTreatmentResult(0, $libelle, $details);
+        $newresult->setStart();
+
+        return $newresult;
+    }
+
+    /**
+     * @param string $details
+     * @param TreatmentResult|null $treatmentresult
+     */
+    public function endTreatmentWithSuccess($details = "", $treatmentresult = null) {
+        dd(is_null($treatmentresult) ? $this->latestTreatmentResult : $treatmentresult);
+        $ending_result = is_null($treatmentresult) ? $this->latestTreatmentResult : $treatmentresult;
+        $ending_result->setSuccess();
+    }
+
+    /**
+     * @param string $details
+     * @param TreatmentResult|null $treatmentresult
+     */
+    public function endTreatmentWithFailure($details, $treatmentresult = null) {
+        $ending_result = is_null($treatmentresult) ? $this->latestTreatmentResult : $treatmentresult;
+        $ending_result->setFailed($details);
     }
 
     public function addNewTreatmentResult($resultat, $libelle, $details = null) : ?TreatmentResult

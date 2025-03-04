@@ -37,7 +37,7 @@ class ExecBatchService implements ITreatmentService
      * @param Treatment $treatment
      * @return TreatmentResult
      */
-    public function execTreatment($treatment): TreatmentResult
+    public function execService($treatment): TreatmentResult
     {
         $this->simrequest = $treatment->uppertreatment->uppertreatment;
         $this->treatment = $treatment;
@@ -46,37 +46,37 @@ class ExecBatchService implements ITreatmentService
         // Start Attempt
         //$result = exec('start ' . self::$BATCH_FOLDER . "\\" . self::$BATCH_NAME . " " . $this->sim->iccid . " " . $this->file_prefix . " " . $this->file_extension);
 
-        if ($this->checkInputs()) {
+        if ($this->checkRequiredInputs()) {
             $result = Process::run('start ' . self::$BATCH_FOLDER . "\\" . self::$BATCH_NAME . " " . $this->simrequest->sim ->iccid . " " . $this->simrequest->file_prefix . " " . $this->simrequest->file_extension);
             // wait for delay
             sleep(self::$BATCH_DELAY_SECONDS);
 
             // succes
-            $this->treatmentresult->setSuccess();
+            $this->treatment->endTreatmentWithSuccess();
         }
 
         return $this->treatmentresult;
     }
 
-    private function checkInputs() {
+    private function checkRequiredInputs() {
 
         if (! $this->simrequest->sim) {
-            $this->treatmentresult->setFailed("Sim non renseigne");
+            $this->treatment->endTreatmentWithFailure("Sim non renseigne");
             return false;
         }
 
         if (! $this->simrequest->sim->iccid) {
-            $this->treatmentresult->setFailed("ICCID non renseigne");
+            $this->treatment->endTreatmentWithFailure("ICCID non renseigne");
             return false;
         }
 
         if (! $this->simrequest->file_prefix) {
-            $this->treatmentresult->setFailed("PREFIX fichier non renseigne");
+            $this->treatment->endTreatmentWithFailure("PREFIX fichier non renseigne");
             return false;
         }
 
         if (! $this->simrequest->file_extension) {
-            $this->treatmentresult->setFailed("EXTENSION fichier non renseigne");
+            $this->treatment->endTreatmentWithFailure("EXTENSION fichier non renseigne");
             return false;
         }
 

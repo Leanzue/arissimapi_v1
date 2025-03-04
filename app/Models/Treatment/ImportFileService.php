@@ -35,41 +35,41 @@ class ImportFileService implements ITreatmentService
      * @param Treatment $treatment
      * @return TreatmentResult
      */
-    public function execTreatment($treatment): TreatmentResult
+    public function execService($treatment): TreatmentResult
     {
         $this->simrequest = $treatment->uppertreatment->uppertreatment;
         $this->treatment = $treatment;
         $this->treatmentresult = TreatmentResult::createNewResult($treatment, $this->simrequest, "Importation Fichier Reponse");
 
-        if ($this->checkInputs()) {
+        if ($this->checkRequiredInputs()) {
             try {
                 $import_object = Excel::import(new SimRequestResponseFilesImport($this->simrequest), $this->simrequest->response_file_name);
 
                 // succes
-                $this->treatmentresult->setSuccess();
+                $this->treatment->endTreatmentWithSuccess();
 
             } catch (\Exception $e) {
-                $this->treatmentresult->setFailed($e->getMessage());
+                $this->treatment->endTreatmentWithFailure($e->getMessage());
                 return $this->treatmentresult;
             }
         }
         return $this->treatmentresult;
     }
 
-    private function checkInputs() {
+    private function checkRequiredInputs() {
 
         if (! $this->simrequest) {
-            $this->treatmentresult->setFailed("Requete non renseigne");
+            $this->treatment->endTreatmentWithFailure("Requete non renseigne");
             return false;
         }
 
         if (! $this->simrequest->sim->iccid) {
-            $this->treatmentresult->setFailed("ICCID non renseigne");
+            $this->treatment->endTreatmentWithFailure("ICCID non renseigne");
             return false;
         }
 
-        if (! $this->simrequest->isBatchResponseFileExists()) {
-            $this->treatmentresult->setFailed("FICHIER non cree");
+        if (! $this->simrequest->is_batch_response_file_exists) {
+            $this->treatment->endTreatmentWithFailure("FICHIER non cree");
             return false;
         }
 

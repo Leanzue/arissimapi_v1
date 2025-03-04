@@ -6,11 +6,11 @@ use App\Models\User;
 use App\Models\BaseModel;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
-use App\Events\TreatmentSucceedEvent;
 use App\Models\SimRequest\SimRequest;
 use App\Traits\Treatment\HasTreatment;
-use App\Events\TreatmentDispatchedEvent;
 use App\Contrats\Treatment\IHasTreatment;
+use App\Events\TreatmentStatusChangedEvent;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,10 +19,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * Class TreatmentAttempt
  * @package App\Models
  *
+ * @property int $id
  * @property string $uuid
- *
- * @property Carbon $date_debut
- * @property Carbon $date_fin
  * @property string $description
  *
  * @property integer|null $attempt_status_id
@@ -83,6 +81,7 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
     }
 
     /**
+     * retourne les traitements de la tentative|la relation eloquent
      * @return HasMany
      */
     public function treatments()
@@ -90,23 +89,19 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
         return $this->hasMany(Treatment::class, "treatment_attempt_id");
     }
 
+    /**
+     * retourne le dernier traitement de la tentative|la relation eloquent
+     * @return HasOne
+     */
     public function latesttreatment()
     {
         return $this->hasOne(Treatment::class, 'treatment_attempt_id')->ofMany('id', 'max');
     }
-
-    public function treatmentattemptparent()
-    {
-        return $this->belongsTo(TreatmentAttempt::class, "treatmentattempt_parent_id");
-    }
-    #endregion
-
-    #region Treatment Status Management
-
     #endregion
 
     #region Insert & Update
     /**
+     * insert un nouvel objet TreatmentAttempt dans la base de données
      * @param SimRequest $simrequest
      * @param string $description
      * @return TreatmentAttempt
@@ -114,7 +109,6 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
     public static function insertData($simrequest, $description = "")
     {
         $new_treatmentattempt = self::create([
-            'date_debut' => (New Carbon())->format('Y-m-d H:i:s'),
             'description' => $description,
         ]);
 
@@ -128,6 +122,7 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
     }
 
     /**
+     * Modifie un objet TreatmentAttempt à partir de la base de données
      * @param SimRequest $simrequest
      * @param string $description
      * @return $this
@@ -145,6 +140,7 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
     }
 
     /**
+     * Modifie ou insert un objet TreatmentAttempt dans la base de données
      * @param SimRequest $simrequest
      * @param string $description
      *
@@ -162,25 +158,28 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
     }
     #endregion
 
+    #region Excute Treatment
     /**
+     * retourne les tentatives qui peuvent etre exécutés
      * @return TreatmentAttempt[]|null
      */
     public static function getTreatmentsToBeExecuted()
     {
         return TreatmentAttempt::
-            where('treatment_status_id', TreatmentStatus::getWaitingStatus()->id)
+        where('treatment_status_id', TreatmentStatus::getWaitingStatus()->id)
             ->OrWhere('treatment_status_id', TreatmentStatus::getFailedStatus()->id)
             ->OrWhere('treatment_status_id', TreatmentStatus::getSuspendedStatus()->id)
             ->get();
     }
-
-    #region Excute Treatment
 
     public function executeAttempt()
     {
         if (count($this->treatments) === 0) {
             // Aucun traitement
             $this->getNextTreatment()->dispatchTreatment();
+
+            // Creéer le Resultat de la Tentative
+            $this->startTreatment("Exécution Tentative (" . $this->id . ") - Requête (" . $this->uppertreatment->id . ")");
 
             return;
         }
@@ -204,45 +203,53 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
             return;
         }
 
+        // -> si le dernier est en suspension
+        if ($this->latesttreatment->isSuspended()) {
+            $this->subTreatmentStatusChanged($this->latesttreatment);
+            return;
+        }
+
         // -> si le dernier  est  running
         if ($this->latesttreatment->isRunning()) {
             // -> ne pas intervenir  et sortir
             return;
         }
-
-        // -> si le dernier est en suspension
-        if ($this->latesttreatment->isSuspended()) {
-            //-> re-tenter si le nombre max de tentatives est atteint
-            if ($this->latesttreatment->treatmentresults()->count() >= self::$MAX_TREATMENT_SUSPENDED_RETRY) {
-                //-> marquer la tentative comme Failed (Echec de la tentative)
-                $this->setMaxSuspended();
-                //
-                $this->uppertreatment->setSuspended();
-            } else {
-                //-> sinon Reessayer a nouveau
-                $this->latesttreatment->dispatchTreatment();
-                $this->setWaiting();
-            }
-            return;
-        }
     }
 
     /**
+     * crée un nouveau traitement d'exécution de Batch
      * @return Treatment
      */
     private function createNewExecBatch()
     {
         return $this->createNewTreatment(ExecBatchService::class, "Exec Batch Service", "Exec Batch Service");
     }
+
+    /**
+     * crée un nouveau traitement d'importation/parse de fichier reponse
+     * @return Treatment
+     */
     private function createNewImportFile()
     {
         return $this->createNewTreatment(ImportFileService::class, "Import File Servie", "Import File Servie");
     }
+
+    /**
+     * crée un nouveau traitement d'envoi de reponse
+     * @return Treatment
+     */
     private function createSendResponse()
     {
         return $this->createNewTreatment(SendResponseService::class, "Send Response Service", "Send Response Service");
     }
 
+    /**
+     * crée et attache un nouveau traitement pour la tentative
+     * @param $service_class
+     * @param $libelle_service
+     * @param $description
+     * @return Treatment
+     */
     private function createNewTreatment($service_class, $libelle_service, $description) {
         $treatment = Treatment::insertData($service_class, $libelle_service, $description);
         $treatment->uppertreatment()->associate($this)->save();
@@ -251,6 +258,7 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
     }
 
     /**
+     * retourne le prochain traitement de la tentative
      * @param int $posi
      * @return Treatment|null
      */
@@ -271,54 +279,79 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
                 return $this->createSendResponse();
                 break;
         }
-
-        /*if ($this->latesttreatment->service_class === ExecBatchService::class) {
-            return $this->createNewImportFile();
-        } elseif ($this->latesttreatment->service_class === ImportFileService::class) {
-            return $this->createSendResponse();
-        }*/
         return null;
     }
     #endregion
 
     #region Treatment Status Management
     /**
-     * @param IHasTreatment $subtreatment
+     * @param IHasTreatment|Treatment $subtreatment
      */
     public function subTreatmentStatusChanged($subtreatment)
     {
-        if ( $subtreatment->isQueueing() ) {
-            TreatmentDispatchedEvent::dispatch($this);
+        if ( $subtreatment->isWaiting() ) {
+            $this->setWaiting();
+            TreatmentStatusChangedEvent::dispatch($this);
+        } elseif ( $subtreatment->isQueueing() ) {
+            $this->setQueueing();
+            TreatmentStatusChangedEvent::dispatch($this);
         } elseif ( $subtreatment->isRunning() ) {
-            // TODO dd
+            $this->setRunning();
+            TreatmentStatusChangedEvent::dispatch($this);
         } elseif ( $subtreatment->isSuccess() ) {
             $this->subTreatmentSucceed($subtreatment);
         } elseif ( $subtreatment->isFailed() ) {
             $this->subTreatmentFailed($subtreatment);
-        }
-    }
-
-    /**
-     * @param IHasTreatment $subtreatment
-     */
-    public function subTreatmentFailed($subtreatment) {
-        //-> re-tenter si le nombre max de tentatives est atteint
-        if ($subtreatment->treatmentresults()->count() >= self::$MAX_TREATMENT_FAILED_RETRY) {
-            // -> marquer la tentative comme Max-Failed (Echec de la tentative)
-            $this->setMaxFailed();
-            //marquer la requete comme failed
-            $this->uppertreatment->subTreatmentStatusChanged($this);
-        } else {
-            // -> sinon Reessayer a nouveau
-            $this->setWaiting();
-            //$subtreatment->dispatchTreatment();
+        } elseif ($subtreatment->isMaxFailed() ) {
+            $this->subTreatmentFailed($subtreatment);
+        } elseif ($subtreatment->isSuspended() ) {
+            $this->subTreatmentSuspended($subtreatment);
+        } elseif ($subtreatment->isMaxSuspended() ) {
+            $this->subTreatmentSuspended($subtreatment);
         }
     }
 
     /**
      * @param IHasTreatment|Treatment $subtreatment
      */
-    public function subTreatmentSucceed($subtreatment) {
+    private function subTreatmentFailed($subtreatment) {
+        //-> re-tenter si le nombre max de tentatives est atteint
+        if ($subtreatment->treatmentresults()->count() >= self::$MAX_TREATMENT_FAILED_RETRY) {
+            // -> marquer la tentative comme Max-Failed (Echec de la tentative)
+            $this->setMaxFailed();
+            // et dispatcher le changement de statut
+            TreatmentStatusChangedEvent::dispatch($this);
+
+            $this->subtreatmentEndWithFailure($subtreatment);
+        } else {
+            // -> sinon Reessayer a nouveau
+            $this->setWaiting();
+            // et dispatcher le changement de statut
+            TreatmentStatusChangedEvent::dispatch($this);
+        }
+    }
+
+    /**
+     * @param IHasTreatment|Treatment $subtreatment
+     */
+    public function subTreatmentSuspended($subtreatment) {
+        //-> re-tenter si le nombre max de tentatives est atteint
+        if ($subtreatment->treatmentresults()->count() >= self::$MAX_TREATMENT_SUSPENDED_RETRY) {
+            //-> marquer la tentative comme Failed (Echec de la tentative)
+            $this->setMaxSuspended();
+            // et dispatcher le changement de statut
+            TreatmentStatusChangedEvent::dispatch($this);
+            $this->subtreatmentEndWithFailure($subtreatment);
+        } else {
+            //-> sinon Reessayer a nouveau
+            $subtreatment->dispatchTreatment();
+        }
+    }
+
+    /**
+     * @param IHasTreatment|Treatment $subtreatment
+     */
+    private function subTreatmentSucceed($subtreatment) {
         // on passe au suivant
         Log::info("TreatmentAttempt - subTreatmentSucceed (" . $subtreatment->id . "). service: " . $subtreatment->service_class);
         $treatment = $this->getNextTreatment();
@@ -326,14 +359,23 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
         if (is_null($treatment)) {
             // marquer la tentative comme success
             $this->setSuccess();
-            // et marquer la requete comme success
-            //TreatmentSucceedEvent::dispatch($this);
-            $this->uppertreatment->subTreatmentStatusChanged($this);
+            // et dispatcher le changement de statut
+            TreatmentStatusChangedEvent::dispatch($this);
+
+            // fin de la tentative de traitement
+            $this->endTreatmentWithSuccess();
         } else {
             // sinon, on l'execute
             $treatment->dispatchTreatment();
-            //$this->setWaiting();
         }
+    }
+
+    /**
+     * @param IHasTreatment|Treatment $subtreatment
+     */
+    private function subtreatmentEndWithFailure($subtreatment) {
+        // fin de la tentative de traitement
+        $this->endTreatmentWithFailure("Echec Traitement " . $subtreatment->service_class . " (" . $subtreatment->id . ")");
     }
     #endregion
 }

@@ -23,8 +23,6 @@ interface IHasTreatmentStatus
     #endregion
 
     #region Status Setters
-    public function setStart();
-    public function setEnded();
     public function setWaiting();
     public function setQueueing();
     public function setTrying();

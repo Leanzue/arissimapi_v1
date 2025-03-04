@@ -22,6 +22,18 @@ interface IHasTreatmentResult
     public function oldestTreatmentResult();
     #endregion
 
+    public function startTreatment($libelle, $details = "En cours") : TreatmentResult;
+    /**
+     * @param string $details
+     * @param TreatmentResult|null $treatmentresult
+     */
+    public function endTreatmentWithSuccess($details = "", $treatmentresult = null);
+    /**
+     * @param string $details
+     * @param TreatmentResult|null $treatmentresult
+     */
+    public function endTreatmentWithFailure($details, $treatmentresult = null);
+
     #region Inserts & Update
     public function addNewTreatmentresult($resultat, $libelle, $details = null) : ?TreatmentResult;
     public function removeTreatmentResult($treatmentresult);

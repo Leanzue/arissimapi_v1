@@ -20,8 +20,6 @@ return new class extends Migration
             $table->id();
             $table->string('service_class')->comment('classe service de la tentative (qui s execute)');
             $table->string('libelle_service')->comment('libelle du service de la tentative (qui s execute)');
-            $table->timestamp('date_debut')->comment('date de debut du traitement');
-            $table->timestamp('date_fin')->nullable()->comment('date de fin du traitement');
             $table->string('description')->nullable()->comment('decrisption de la tentative');
 
             $table->foreignId('treatment_attempt_id')->nullable()

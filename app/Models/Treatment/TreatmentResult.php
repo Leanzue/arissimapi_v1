@@ -3,10 +3,12 @@
 namespace App\Models\Treatment;
 
 use App\Models\BaseModel;
+use Illuminate\Support\Carbon;
 use App\Models\SimRequest\SimRequest;
 use App\Contrats\Treatment\IHasTreatment;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use function Carbon\this;
 
 
 /**
@@ -15,6 +17,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  *
  * @property string $resultat
  * @property string $libelle
+ * @property Carbon $date_debut
+ * @property Carbon $date_fin
  * @property string $details
  * @property int $posi
  *
@@ -122,11 +126,23 @@ class TreatmentResult extends BaseModel
      * @return TreatmentResult
      */
     public static function createNewResult($hastreatment, $simrequest, $libelle_service) {
-        $resultat = 0;
         $libelle = $libelle_service . " - Requete n° " . $simrequest->id;
-        $details = "En cours";
 
-        return $hastreatment->addNewTreatmentresult($resultat, $libelle, $details);
+        return $hastreatment->startTreatment($libelle);
+    }
+
+    public function setStart($save = true) {
+        $this->date_debut = (New Carbon())->format('Y-m-d H:i:s');
+        if ( $save ) {
+            $this->save();
+        }
+    }
+
+    public function setEnded($save = true){
+        $this->date_fin = (New Carbon())->format('Y-m-d H:i:s');
+        if ( $save ) {
+            $this->save();
+        }
     }
 
     /**
@@ -137,6 +153,7 @@ class TreatmentResult extends BaseModel
     public function setSuccess($message = "Succes") {
         $this->details = $message;
         $this->resultat = 1;
+        $this->setEnded(false);
 
         $this->save();
     }
@@ -149,6 +166,7 @@ class TreatmentResult extends BaseModel
     public function setFailed($message) {
         $this->details = "Echec - " . $message;
         $this->resultat = -1;
+        $this->setEnded(false);
 
         $this->save();
     }

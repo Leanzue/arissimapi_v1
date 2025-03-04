@@ -26,16 +26,6 @@ trait HasTreatmentStatus
     }
 
     #region Treatment Status Management
-    public function setStart() {
-        $this->date_debut = (New Carbon())->format('Y-m-d H:i:s');
-        $this->save();
-    }
-
-    public function setEnded(){
-        $this->date_fin = (New Carbon())->format('Y-m-d H:i:s');
-        $this->save();
-    }
-
     public function setWaiting()
     {
         // application du statut running (en utilisant le scope)

@@ -17,9 +17,6 @@ return new class extends Migration
         Schema::create($this->table_name, function (Blueprint $table) {
             $table->id();
 
-            $table->timestamp('date_debut')->comment('date de debut de la tentative ');
-            $table->timestamp('date_fin')->nullable()->comment('date de fin de la tentative');
-
             $table->string('description')->nullable()->comment('decrisption de la tentative');
 
             $table->foreignId('treatment_status_id')->nullable()

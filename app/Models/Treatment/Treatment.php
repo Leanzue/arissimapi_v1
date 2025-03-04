@@ -5,11 +5,9 @@ namespace App\Models\Treatment;
 use App\Models\BaseModel;
 use Illuminate\Support\Carbon;
 use App\Jobs\Treatment\TreatmentJob;
-use App\Events\TreatmentFailedEvent;
-use App\Events\TreatmentSucceedEvent;
 use App\Traits\Treatment\HasTreatment;
-use App\Events\TreatmentDispatchedEvent;
 use App\Contrats\Treatment\IHasTreatment;
+use App\Events\TreatmentStatusChangedEvent;
 use App\Contrats\Treatment\ITreatmentService;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -21,10 +19,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property int $id
  * @property string|ITreatmentService $service_class
  * @property string $libelle_service
- * @property Carbon $date_debut
- * @property Carbon $date_fin
  * @property string $description
  *
+ * @method static Treatment|null find(int $id)
  */
 class Treatment extends BaseModel implements IHasTreatment
 {
@@ -75,7 +72,7 @@ class Treatment extends BaseModel implements IHasTreatment
 
     #region Relationships
     /**
-     * get Upper Treatment (Treatment Attempt)
+     * retourne le traitement supérieur/parent de la requete|la relation eloquent.
      * @return BelongsTo
      */
     public function uppertreatment()
@@ -86,6 +83,16 @@ class Treatment extends BaseModel implements IHasTreatment
 
     #region Insert & Update
     /**
+     * @param $id
+     * @return Treatment|null
+     */
+    public static function getById($id) {
+        return Treatment::find($id);
+    }
+
+    /**
+     * Insert un nouvel Treatment dans la base de données
+     *
      * @param string $service_class
      * @param string $libelle_service
      * @param string $description
@@ -94,7 +101,6 @@ class Treatment extends BaseModel implements IHasTreatment
     public static function insertData($service_class, $libelle_service, $description = "")
     {
         return self::create([
-            'date_debut' => (New Carbon())->format('Y-m-d H:i:s'),
             'service_class' => $service_class,
             'libelle_service' => $libelle_service,
             'description' => $description,
@@ -102,6 +108,7 @@ class Treatment extends BaseModel implements IHasTreatment
     }
 
     /**
+     * Modifie un Treatment à partir de la base de données
      * @param string $service_class
      * @param string $libelle_service
      * @param string $description
@@ -119,6 +126,7 @@ class Treatment extends BaseModel implements IHasTreatment
     }
 
     /**
+     *  Modifie ou insert un Treatment à partir de la base de données
      * @param string $service_class
      * @param string $libelle_service
      * @param string $description
@@ -138,60 +146,62 @@ class Treatment extends BaseModel implements IHasTreatment
     #endregion
 
     #region Excute Treatment
+
+    /**
+     * exécute le traitement
+     */
     public function executeTreatment() {
+
         // mettre le traitement comme running
         $this->setRunning();
-        $this->uppertreatment->setRunning();
+
+        // et dispatcher le changement de statut
+        TreatmentStatusChangedEvent::dispatch($this);
 
         // on instancie le service a executer
         $this->service = New $this->service_class();
 
         // On execute le service
-        $result = $this->service->execTreatment($this);
+        $result = $this->service->execService($this);
 
         // Setter le statut en fonction du resultat
-        //$result->save();
         if ($result->resultat === 0) {
             // aucun traitement
             $this->setWaiting();
-            // Marquer la tentative waiting
-            $this->uppertreatment->setWaiting();
+
+            // et dispatcher le changement de statut
+            TreatmentStatusChangedEvent::dispatch($this);
         } elseif ($result->resultat === 1) {
             // succes traitement
-            //$this->setSuccess();
-           // $this->uppertreatment->setWaiting();
-            TreatmentSucceedEvent::dispatch($this);
-            //$this->uppertreatment->subTreatmentSucceed($this);
+            $this->setSuccess();
+            // et dispatcher le changement de statut
+            TreatmentStatusChangedEvent::dispatch($this);
         } elseif ($result->resultat === -1) {
             // échec traitement
-            //$this->setFailed();
-            // echec tentative
-           // $this->uppertreatment->setFailed();
-            TreatmentFailedEvent::dispatch($this);
+            $this->setFailed();
+            // et dispatcher le changement de statut
+            TreatmentStatusChangedEvent::dispatch($this);
         } elseif ($result->resultat === 2) {
             // traitement suspendu
             $this->setSuspended();
-            // Marquer la tentative Suspended
-            $this->uppertreatment->setSuspended();
+            // et dispatcher le changement de statut
+            TreatmentStatusChangedEvent::dispatch($this);
         }
     }
-
     public function dispatchTreatment() {
         TreatmentJob::dispatch($this);
-        //$this->uppertreatment->subTreatmentDispatched($this);
     }
     #endregion
 
-    /**
-     * @param int $id
-     * @return Treatment
-     */
-    public static function getById($id) {
-        return Treatment::find($id);
-    }
 
+    #region status management
+    /**
+     * le statut d'un sous-traitement (Treatment) à changé
+     * @param IHasTreatment|TreatmentAttempt $subtreatment
+     */
     public function subTreatmentStatusChanged($subtreatment)
     {
-        // TODO: Implement subTreatmentStatusChanged() method.
     }
+    #endregion
+
 }

@@ -13,7 +13,7 @@ interface ITreatmentService
      * @param Treatment $treatment
      * @return TreatmentResult
      */
-    public function execTreatment($treatment): TreatmentResult;
+    public function execService($treatment): TreatmentResult;
 
     /**
      * @return string

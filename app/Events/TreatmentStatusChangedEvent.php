@@ -9,22 +9,22 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 
-class TreatmentFailedEvent
+class TreatmentStatusChangedEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * @var IHasTreatment
      */
-    public $hastreatment;
-
+     public $hastreatment;
     /**
-     * Create a new event instance.
-     * @param IHasTreatment $hastreatment
+     * TreatmentStatusChangedEvent constructor.
+     * @param $hastreatment
      */
-    public function __construct($hastreatment) {
+    public function __construct($hastreatment)
+    {
         $this->hastreatment = $hastreatment;
-        Log::info("TreatmentFailedEvent, " . get_class($hastreatment) . " (" . $hastreatment->id . ")");
+        Log::info("TreatmentStatusChangedEvent, " . get_class($hastreatment) . " (" . $hastreatment->id . ")");
     }
 
     /**

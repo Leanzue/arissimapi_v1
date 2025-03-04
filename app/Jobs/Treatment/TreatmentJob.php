@@ -2,10 +2,10 @@
 
 namespace App\Jobs\Treatment;
 
-use App\Events\TreatmentDispatchedEvent;
 use App\Models\Treatment\Treatment;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use App\Events\TreatmentStatusChangedEvent;
 
 class TreatmentJob implements ShouldQueue
 {
@@ -23,7 +23,8 @@ class TreatmentJob implements ShouldQueue
     public function __construct($treatment)
     {
         $this->onQueue($treatment->service_class::getQueueName());
-        TreatmentDispatchedEvent::dispatch($treatment);
+        $treatment->setQueueing();
+        TreatmentStatusChangedEvent::dispatch($treatment);
         //$treatment->setQueueing();
         //$treatment->treatmentattempt->setQueueing();
         $this->treatment_id = $treatment->id;
