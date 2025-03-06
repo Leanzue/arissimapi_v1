@@ -19,7 +19,7 @@ return new class extends Migration
     {
         Schema::create($this->table_name, function (Blueprint $table) {
             $table->id();
-            $table->string('code')->comment('genération du code requete');
+            $table->string('code')->nullable()->comment('genération du code requete');
             $table->string('description')->comment('description de la requête');
             $table->string('client_ip_address')->comment('adresse du client');
             $table->string('client_key_request')->nullable()->comment('cle de requete du client');

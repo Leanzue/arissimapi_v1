@@ -1,11 +1,12 @@
 <?php
 
 
-namespace App\Models\Treatment;
+namespace App\Models\Treatment\Services;
 
-
+use App\Models\Treatment\Treatment;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\SimRequest\SimRequest;
+use App\Models\Treatment\TreatmentResult;
 use App\Contrats\Treatment\ITreatmentService;
 use App\Imports\SimRequestResponseFilesImport;
 
@@ -21,11 +22,6 @@ class ImportFileService implements ITreatmentService
      */
     public $treatment;
 
-    /**
-     * @var TreatmentResult
-     */
-    public $treatmentresult;
-
     public static function getQueueName()
     {
         return "importfileservice";
@@ -39,7 +35,7 @@ class ImportFileService implements ITreatmentService
     {
         $this->simrequest = $treatment->uppertreatment->uppertreatment;
         $this->treatment = $treatment;
-        $this->treatmentresult = TreatmentResult::createNewResult($treatment, $this->simrequest, "Importation Fichier Reponse");
+        TreatmentResult::createNewServiceResult($treatment, $this->simrequest, "Importation Fichier Reponse");
 
         if ($this->checkRequiredInputs()) {
             try {
@@ -50,10 +46,10 @@ class ImportFileService implements ITreatmentService
 
             } catch (\Exception $e) {
                 $this->treatment->endTreatmentWithFailure($e->getMessage());
-                return $this->treatmentresult;
+                return $this->treatment->latestTreatmentResult;
             }
         }
-        return $this->treatmentresult;
+        return $this->treatment->latestTreatmentResult;
     }
 
     private function checkRequiredInputs() {

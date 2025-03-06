@@ -8,14 +8,13 @@ use App\Models\SimRequest\SimRequest;
 use App\Contrats\Treatment\IHasTreatment;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use function Carbon\this;
 
 
 /**
  * Class TreatmentResult
  * @package App\Models
  *
- * @property string $resultat
+ * @property int $resultat
  * @property string $libelle
  * @property Carbon $date_debut
  * @property Carbon $date_fin
@@ -125,7 +124,7 @@ class TreatmentResult extends BaseModel
      *
      * @return TreatmentResult
      */
-    public static function createNewResult($hastreatment, $simrequest, $libelle_service) {
+    public static function createNewServiceResult($hastreatment, $simrequest, $libelle_service) {
         $libelle = $libelle_service . " - Requete n° " . $simrequest->id;
 
         return $hastreatment->startTreatment($libelle);

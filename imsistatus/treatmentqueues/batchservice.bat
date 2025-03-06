@@ -1,7 +1,8 @@
 @Echo Off
 
-set rawfolder=C:\xampp\htdocs\arissimapi\
-set queuesfolder=C:\xampp\htdocs\arissimapi\imsistatus\treatmentqueues\
+set currentfolder=%~dp0
+set rawfolder=D:\WorkPersoData\PersoData\VMs\ubuntu_20_lamp\www\arissimapi01\
+set queuesfolder=%currentfolder%
 
 
 CD %rawfolder%

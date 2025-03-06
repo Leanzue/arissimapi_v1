@@ -4,6 +4,7 @@ namespace App\Models\SimRequest;
 
 use App\Models\Sim\Sim;
 use App\Models\BaseModel;
+use Illuminate\Support\Str;
 use App\Traits\Code\HasCode;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
@@ -53,13 +54,15 @@ class SimRequest extends BaseModel implements IHasTreatment
     public static $REQRESPONSE_FOLDER_CONFIG_DIR = "reqresponse_folder";
     public static $REQRESPONSE_FILE_KEY= "_res";
     pUBLIC static $MAX_ATTEMPTS_FAILED_RETRY = 5 ;
+    pUBLIC static $MAX_ATTEMPTS_SUSPENDED_RETRY = 5 ;
     pUBLIC static $FILE_EXTENSION = "csv" ;
 
 
     /** @use HasFactory<\Database\Factories\SimRequestFactory> */
-    use HasFactory, HasCode, HasTreatment;
+    use HasFactory, HasTreatment;
 
     protected $guarded = [];
+    protected $with = ['sim'];
 
 
     #region validation Rules
@@ -216,6 +219,14 @@ class SimRequest extends BaseModel implements IHasTreatment
         return self::insertData($sim, $client_ip_address, $url_response, $file_extension, "", $client_key_request);
     }
 
+    private function setCode() {
+        // insertion du code de la requete
+        $this->code = $this->sim->iccid . "_" . explode("-", Str::orderedUuid())[0];
+        $this->file_prefix = $this->code;
+
+        $this->save();
+    }
+
     /**
      * Insert un nouvel objet SimRequest dans la base de données
      * @param Sim $sim
@@ -253,6 +264,7 @@ class SimRequest extends BaseModel implements IHasTreatment
 
         // Assignation de la sim
         $new_simrequest->sim()->associate($sim);
+        $new_simrequest->setCode();
 
         $new_simrequest->save();
 
@@ -342,34 +354,48 @@ class SimRequest extends BaseModel implements IHasTreatment
 
     /**
      * Exécute la requete
+     * @return void
      */
-    public function execRequest()
+    public function execRequest(): void
     {
         // S'il n'y a pas de tentative,
         if ($this->treatmentattempts()->count() === 0) {
             // Creer une nouvelle
             $this->startNewAttempt();
-
             return;
         }
 
-        // si la derniere tentative est en attente
-        if ($this->latesttreatmentattempt->isWaiting()) {
-            // L'exécuter
-            $this->latesttreatmentattempt->executeAttempt();
+        // si la requete est en attente
+        if ($this->isWaiting()) {
+            // Exécuter la derniere tentative
+            $this->latesttreatmentattempt->execAttempt();
             return;
         }
 
-        // si la derniere tentative a reussi
-        if ($this->latesttreatmentattempt->isSuccess()) {
-            $this->subTreatmentStatusChanged($this->latesttreatmentattempt);
+        // si la requete est en Echec
+        if ($this->isFailed()) {
+            if (! $this->setMaxFailedReached() ) {
+
+                if ( $this->latesttreatmentattempt->isMaxFailed() ) {
+                    // Lancer une nouvelle tentative, si le MAX n'est pas atteint.
+                    $this->startNewAttempt();
+                } else {
+                    $this->latesttreatmentattempt->execAttempt();
+                }
+            }
             return;
         }
 
-        // si la derniere tentative a échoué
-        if ($this->latesttreatmentattempt->isFailed()) {
-            $this->subTreatmentStatusChanged($this->latesttreatmentattempt);
+        // si la requete est Suspend
+        if ($this->isSuspended()) {
+            if (! $this->setMaxSuspendedReached() ) {
+                // Lancer une nouvelle tentative, si le MAX n'est pas atteint.
+                $this->startNewAttempt();
+            }
+            return;
         }
+
+        Log::error("execRequest - la SimRequest (" . $this->id . ") n'est pas prise en compte !!!");
     }
     #endregion
 
@@ -378,7 +404,8 @@ class SimRequest extends BaseModel implements IHasTreatment
      * le statut d'un sous-traitement (Tentative) à changé
      * @param IHasTreatment|TreatmentAttempt $subtreatment
      */
-    public function subTreatmentStatusChanged($subtreatment) {
+    public function subTreatmentStatusChanged($subtreatment): void
+    {
         if ( $subtreatment->isWaiting() ) {
             $this->setWaiting();
         } elseif ( $subtreatment->isQueueing() ) {
@@ -401,16 +428,54 @@ class SimRequest extends BaseModel implements IHasTreatment
     /**
      * @param IHasTreatment $subtreatment
      */
-    private function subTreatmentFailed($subtreatment) {
+    private function subTreatmentFailed(IHasTreatment $subtreatment): void
+    {
         //-> ressayer si le nombre maximal de tentative est atteint
-        if ($this->treatmentattempts()->count() >= self::$MAX_ATTEMPTS_FAILED_RETRY ) {
-            // Marquer le requete comme failed
-            $this->setMaxFailed();
-
+        if ( $this->setMaxFailedReached() ) {
             $this->subtreatmentEndWithFailure($subtreatment);
         } else {
-            // sinon, Reessayer
-            $this->startNewAttempt();
+            // sinon, Reessayer (appreter la requete pour la prochaine tache planifiee)
+            $this->setFailed();
+        }
+    }
+    private function subTreatmentSuspended(IHasTreatment $subtreatment): void
+    {
+        //-> ressayer si le nombre maximal de tentative est atteint
+        if ( $this->setMaxSuspendedReached() ) {
+            $this->subtreatmentEndWithFailure($subtreatment);
+        } else {
+            // sinon, Reessayer (appreter la requete pour la prochaine tache planifiee)
+            $this->setSuspended();
+        }
+    }
+
+    /**
+     * Essaie de mettre la requete max-failed si les conditions sont reunies.
+     * @return bool
+     */
+    private function setMaxFailedReached(): bool
+    {
+        if ($this->treatmentattempts()->count() >= self::$MAX_ATTEMPTS_FAILED_RETRY ) {
+            // Marquer le requete comme max-failed
+            $this->setMaxFailed();
+            // ... et, renvoyer TRUE
+            return true;
+        } else {
+            // renvoyer FALSE
+            return false;
+        }
+    }
+
+    private function setMaxSuspendedReached(): bool
+    {
+        if ($this->treatmentattempts()->count() >= self::$MAX_ATTEMPTS_SUSPENDED_RETRY ) {
+            // Marquer le requete comme max-failed
+            $this->setMaxSuspended();
+            // ... et, renvoyer TRUE
+            return true;
+        } else {
+            // renvoyer FALSE
+            return false;
         }
     }
 
@@ -418,7 +483,7 @@ class SimRequest extends BaseModel implements IHasTreatment
      *le status :en succès
      * @param IHasTreatment $subtreatment
      */
-    private function subTreatmentSucceed($subtreatment)
+    private function subTreatmentSucceed(IHasTreatment $subtreatment): void
     {
         // Marquer la requete comme success
         $this->setSuccess();
@@ -428,28 +493,10 @@ class SimRequest extends BaseModel implements IHasTreatment
     }
 
     /**
-     * le status :en suspension
-     * @param IHasTreatment $subtreatment
-     */
-    private function subTreatmentSuspended ($subtreatment)
-    {
-        //-> ressayer si le nombre maximal de tentative est atteint
-        if ($this->treatmentattempts()->count() >= self::$MAX_ATTEMPTS_FAILED_RETRY) {
-            // Marquer le requete comme suspended
-            $this->setMaxsuspended();
-
-            $this->subtreatmentEndWithFailure($subtreatment);
-        } else {
-            // sinon, Reessayer
-            $this->startNewAttempt();
-        }
-
-    }
-    /**
      * * le status :en suspension
      * @param $subtreatment
      */
-    private function subTreatmentMaxSuspended($subtreatment)
+    private function subTreatmentMaxSuspended($subtreatment): void
     {
         // Marquer la requete comme suspended
         $this->setMaxSuspended();
@@ -458,7 +505,8 @@ class SimRequest extends BaseModel implements IHasTreatment
     /**
      * @param IHasTreatment|TreatmentAttempt $subtreatment
      */
-    private function subtreatmentEndWithFailure($subtreatment) {
+    private function subtreatmentEndWithFailure(IHasTreatment|TreatmentAttempt $subtreatment): void
+    {
         $attempt_no = $this->treatmentattempts()->count() + 1;
         // fin de la tentative de traitement
         $this->endTreatmentWithFailure("Echec Traitement, Tentative N° " . $attempt_no . " (" . $subtreatment->id . ")");
@@ -466,10 +514,11 @@ class SimRequest extends BaseModel implements IHasTreatment
 
 
 
-    private function startNewAttempt() {
+    private function startNewAttempt(): void
+    {
         $attempt_no = $this->treatmentattempts()->count() + 1;
         $treatmentattempt = TreatmentAttempt::insertData($this, "Tentative Execution N° " . $attempt_no);
-        $treatmentattempt->executeAttempt();
+        $treatmentattempt->execAttempt();
 
         // Creéer le Resultat de la Tentative
         $this->startTreatment("Execution Requête (" . $this->id . ") - Tentative N° " . $attempt_no);
@@ -480,7 +529,7 @@ class SimRequest extends BaseModel implements IHasTreatment
     {
         parent::boot();
 
-        self::created(function ($simrequest) {
+        self::created(function (SimRequest $simrequest) {
             // insertion du file prefixe
             if (is_null($simrequest->file_prefix) || $simrequest->file_prefix === "") {
                 $simrequest->file_prefix = $simrequest->code;

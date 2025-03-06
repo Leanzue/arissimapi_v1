@@ -213,7 +213,7 @@ class TreatmentStatus extends BaseModel
     public function updateOne( $code,  $libelle,  $description = null)
     {
         $this->code = $code;
-        $this->$libelle = $libelle;
+        $this->libelle = $libelle;
         $this->description = $description;
 
         $this->save();

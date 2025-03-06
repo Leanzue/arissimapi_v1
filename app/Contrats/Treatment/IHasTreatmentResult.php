@@ -22,7 +22,7 @@ interface IHasTreatmentResult
     public function oldestTreatmentResult();
     #endregion
 
-    public function startTreatment($libelle, $details = "En cours") : TreatmentResult;
+    public function startTreatment($libelle, string $details = "En cours") : ?TreatmentResult;
     /**
      * @param string $details
      * @param TreatmentResult|null $treatmentresult

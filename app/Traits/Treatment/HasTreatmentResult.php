@@ -4,6 +4,7 @@
 namespace App\Traits\Treatment;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 use App\Models\Treatment\TreatmentResult;
 
 /**
@@ -42,7 +43,8 @@ trait HasTreatmentResult
      * @param string $details
      * @return TreatmentResult|null
      */
-    public function startTreatment($libelle, $details = "En cours") : TreatmentResult {
+    public function startTreatment($libelle, string $details = "En cours") : ?TreatmentResult
+    {
         $newresult = $this->addNewTreatmentResult(0, $libelle, $details);
         $newresult->setStart();
 
@@ -54,7 +56,7 @@ trait HasTreatmentResult
      * @param TreatmentResult|null $treatmentresult
      */
     public function endTreatmentWithSuccess($details = "", $treatmentresult = null) {
-        dd(is_null($treatmentresult) ? $this->latestTreatmentResult : $treatmentresult);
+        $this->load('latestTreatmentResult');
         $ending_result = is_null($treatmentresult) ? $this->latestTreatmentResult : $treatmentresult;
         $ending_result->setSuccess();
     }
@@ -64,6 +66,7 @@ trait HasTreatmentResult
      * @param TreatmentResult|null $treatmentresult
      */
     public function endTreatmentWithFailure($details, $treatmentresult = null) {
+        $this->load('latestTreatmentResult');
         $ending_result = is_null($treatmentresult) ? $this->latestTreatmentResult : $treatmentresult;
         $ending_result->setFailed($details);
     }

@@ -1,10 +1,13 @@
 <?php
 
 
-namespace App\Models\Treatment;
+namespace App\Models\Treatment\Services;
 
+use Illuminate\Support\Facades\Log;
+use App\Models\Treatment\Treatment;
 use App\Models\SimRequest\SimRequest;
 use Illuminate\Support\Facades\Process;
+use App\Models\Treatment\TreatmentResult;
 use App\Contrats\Treatment\ITreatmentService;
 
 class ExecBatchService implements ITreatmentService
@@ -18,11 +21,6 @@ class ExecBatchService implements ITreatmentService
      * @var Treatment
      */
     public $treatment;
-
-    /**
-     * @var TreatmentResult
-     */
-    public $treatmentresult;
 
     public static $BATCH_FOLDER = "C:\\xampp\\htdocs\\arissimapi\\imsistatus";
     public static $BATCH_NAME = "execsqlaris.bat";
@@ -41,7 +39,7 @@ class ExecBatchService implements ITreatmentService
     {
         $this->simrequest = $treatment->uppertreatment->uppertreatment;
         $this->treatment = $treatment;
-        $this->treatmentresult = TreatmentResult::createNewResult($treatment, $this->simrequest, "Execution Batch");
+        TreatmentResult::createNewServiceResult($treatment, $this->simrequest, "Execution Batch");
 
         // Start Attempt
         //$result = exec('start ' . self::$BATCH_FOLDER . "\\" . self::$BATCH_NAME . " " . $this->sim->iccid . " " . $this->file_prefix . " " . $this->file_extension);
@@ -51,11 +49,13 @@ class ExecBatchService implements ITreatmentService
             // wait for delay
             sleep(self::$BATCH_DELAY_SECONDS);
 
+            Log::info("ExecBatchService - " . $this->treatment);
+
             // succes
             $this->treatment->endTreatmentWithSuccess();
         }
 
-        return $this->treatmentresult;
+        return $this->treatment->latestTreatmentResult;
     }
 
     private function checkRequiredInputs() {

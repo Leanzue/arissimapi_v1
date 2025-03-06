@@ -1,11 +1,11 @@
 <?php
 
+namespace App\Models\Treatment\Services;
 
-namespace App\Models\Treatment;
-
-
+use App\Models\Treatment\Treatment;
 use Illuminate\Support\Facades\Http;
 use App\Models\SimRequest\SimRequest;
+use App\Models\Treatment\TreatmentResult;
 use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Http\Client\RequestException;
 use App\Contrats\Treatment\ITreatmentService;
@@ -23,11 +23,6 @@ class SendResponseService implements ITreatmentService
      */
     public $treatment;
 
-    /**
-     * @var TreatmentResult
-     */
-    public $treatmentresult;
-
     public static function getQueueName()
     {
         return "sendresponseservice";
@@ -41,7 +36,7 @@ class SendResponseService implements ITreatmentService
     {
         $this->simrequest = $treatment->uppertreatment->uppertreatment;
         $this->treatment = $treatment;
-        $this->treatmentresult = TreatmentResult::createNewResult($treatment, $this->simrequest, "Envoi Reponse");
+        TreatmentResult::createNewServiceResult($treatment, $this->simrequest, "Envoi Reponse");
 
         if ( $this->checkRequiredInputs() ) {
             try {
@@ -60,7 +55,7 @@ class SendResponseService implements ITreatmentService
                 $this->treatment->endTreatmentWithFailure($e->getMessage());
             }
         }
-        return $this->treatmentresult;
+        return $this->treatment->latestTreatmentResult;
     }
 
     private function checkRequiredInputs() {

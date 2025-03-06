@@ -25,8 +25,6 @@ class TreatmentJob implements ShouldQueue
         $this->onQueue($treatment->service_class::getQueueName());
         $treatment->setQueueing();
         TreatmentStatusChangedEvent::dispatch($treatment);
-        //$treatment->setQueueing();
-        //$treatment->treatmentattempt->setQueueing();
         $this->treatment_id = $treatment->id;
     }
 

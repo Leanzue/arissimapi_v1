@@ -28,13 +28,13 @@ class SimRequestExecute extends Command
      */
     public function handle()
     {
-       // Treatment::find(1)->endTreatmentWithSuccess();
+        Log::info("Exec SimRequestExecute.");
         // 1. Recuperer les requetes dans le status
         $waiting_requests = SimRequest::getTreatmentsToBeExecuted();
         //dd(count($waiting_requests));
         if (count($waiting_requests) === 0) {
             // retourner un message pour signifier
-            $this->error("aucune requete a executer");
+            $this->info("Aucune Requete a executer !");
             Log::info("Aucune Requete a executer !");
         } else {
             // 2. Parcour des requetes en vue de:

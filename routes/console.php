@@ -9,4 +9,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote')->hourly();
 
 Schedule::command('simrequest:exec')->everyFifteenSeconds();
-Schedule::command('treatment:attempt-execute')->everyFifteenSeconds();
+Schedule::command('treatment:attempt-exec')->everyFifteenSeconds();

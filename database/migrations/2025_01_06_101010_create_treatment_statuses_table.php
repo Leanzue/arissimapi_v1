@@ -7,8 +7,8 @@ use App\Traits\Migrations\BaseMigrationTrait;
 return new class extends Migration
 {     use BaseMigrationTrait;
 
-    public $table_name = 'Treatment_Statuses';
-    public $table_comment = 'Treatment_Status of objects in the system.';
+    public $table_name = 'treatment_statuses';
+    public $table_comment = 'les statuts des Traitemenst du Systeme.';
     /**
      * Run the migrations.
      */

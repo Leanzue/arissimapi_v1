@@ -3,7 +3,6 @@
 namespace App\Models\Treatment;
 
 use App\Models\BaseModel;
-use Illuminate\Support\Carbon;
 use App\Jobs\Treatment\TreatmentJob;
 use App\Traits\Treatment\HasTreatment;
 use App\Contrats\Treatment\IHasTreatment;
@@ -163,7 +162,8 @@ class Treatment extends BaseModel implements IHasTreatment
 
         // On execute le service
         $result = $this->service->execService($this);
-
+        //$result->refresh();
+        //Log::info("Treatment - result: " . $result);
         // Setter le statut en fonction du resultat
         if ($result->resultat === 0) {
             // aucun traitement

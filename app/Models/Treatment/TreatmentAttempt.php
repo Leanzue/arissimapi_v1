@@ -12,8 +12,11 @@ use App\Contrats\Treatment\IHasTreatment;
 use App\Events\TreatmentStatusChangedEvent;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Treatment\Services\ExecBatchService;
+use App\Models\Treatment\Services\ImportFileService;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Treatment\Services\SendResponseService;
 
 /**
  * Class TreatmentAttempt
@@ -172,9 +175,9 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
             ->get();
     }
 
-    public function executeAttempt()
+    public function execAttempt()
     {
-        if (count($this->treatments) === 0) {
+        if ( $this->treatments()->count() === 0 ) {
             // Aucun traitement
             $this->getNextTreatment()->dispatchTreatment();
 
@@ -184,36 +187,34 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
             return;
         }
 
-        //si le dernier est en attente de traitement
+        // si la tentative est en attente de traitement
         if ($this->isWaiting()) {
-            //  -> lancer  a nouveau
+            // lancer  a nouveau
             $this->latesttreatment->dispatchTreatment();
             return;
         }
 
-        // -> si le dernier traitement est un success,
-        if ($this->latesttreatment->isSuccess()) {
-            $this->subTreatmentStatusChanged($this->latesttreatment);
+        // si la tentative est en Echec
+        if ($this->isFailed()) {
+            $this->load('latesttreatment');
+            if (! $this->setMaxFailedReached($this->latesttreatment) ) {
+                // re-executer a nouveau le dernier traitement, si le MAX n'est pas atteint.
+                $this->latesttreatment->dispatchTreatment();
+            }
             return;
         }
 
-        // -> si le dernier est un echec,
-        if ($this->latesttreatment->isFailed()) {
-            $this->subTreatmentStatusChanged($this->latesttreatment);
+        // si la tentative est Suspend
+        if ($this->isSuspended()) {
+            $this->load('latesttreatment');
+            if (! $this->setMaxSuspendedReached($this->latesttreatment) ) {
+                // re-executer a nouveau le dernier traitement, si le MAX n'est pas atteint.
+                $this->latesttreatment->dispatchTreatment();
+            }
             return;
         }
 
-        // -> si le dernier est en suspension
-        if ($this->latesttreatment->isSuspended()) {
-            $this->subTreatmentStatusChanged($this->latesttreatment);
-            return;
-        }
-
-        // -> si le dernier  est  running
-        if ($this->latesttreatment->isRunning()) {
-            // -> ne pas intervenir  et sortir
-            return;
-        }
+        Log::error("execAttempt - la Tentative (" . $this->id . ") n'est pas prise en compte !!!");
     }
 
     /**
@@ -314,18 +315,15 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
     /**
      * @param IHasTreatment|Treatment $subtreatment
      */
-    private function subTreatmentFailed($subtreatment) {
+    private function subTreatmentFailed(IHasTreatment|Treatment $subtreatment): void
+    {
+        Log::info("TreatmentAttempt - subTreatmentFailed, subtreatment->treatmentresults()->count(): " . $subtreatment->treatmentresults()->count());
         //-> re-tenter si le nombre max de tentatives est atteint
-        if ($subtreatment->treatmentresults()->count() >= self::$MAX_TREATMENT_FAILED_RETRY) {
-            // -> marquer la tentative comme Max-Failed (Echec de la tentative)
-            $this->setMaxFailed();
-            // et dispatcher le changement de statut
-            TreatmentStatusChangedEvent::dispatch($this);
-
+        if ( $this->setMaxFailedReached($subtreatment) ) {
             $this->subtreatmentEndWithFailure($subtreatment);
         } else {
-            // -> sinon Reessayer a nouveau
-            $this->setWaiting();
+            // -> sinon, Reessayer (appreter la requete pour la prochaine tache planifiee)
+            $this->setFailed();
             // et dispatcher le changement de statut
             TreatmentStatusChangedEvent::dispatch($this);
         }
@@ -334,17 +332,45 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
     /**
      * @param IHasTreatment|Treatment $subtreatment
      */
-    public function subTreatmentSuspended($subtreatment) {
+    public function subTreatmentSuspended(IHasTreatment|Treatment $subtreatment): void
+    {
         //-> re-tenter si le nombre max de tentatives est atteint
-        if ($subtreatment->treatmentresults()->count() >= self::$MAX_TREATMENT_SUSPENDED_RETRY) {
-            //-> marquer la tentative comme Failed (Echec de la tentative)
-            $this->setMaxSuspended();
-            // et dispatcher le changement de statut
-            TreatmentStatusChangedEvent::dispatch($this);
+        if ( $this->setMaxSuspendedReached() ) {
             $this->subtreatmentEndWithFailure($subtreatment);
         } else {
             //-> sinon Reessayer a nouveau
             $subtreatment->dispatchTreatment();
+        }
+    }
+
+    private function setMaxFailedReached(IHasTreatment|Treatment $subtreatment): bool
+    {
+        $subtreatment->load('treatmentresults');
+        if ($subtreatment->treatmentresults()->count() >= self::$MAX_TREATMENT_FAILED_RETRY ) {
+            // -> marquer la tentative comme Max-Failed (Echec de la tentative)
+            $this->setMaxFailed();
+            // et dispatcher le changement de statut
+            TreatmentStatusChangedEvent::dispatch($this);
+            // ... et, renvoyer TRUE
+            return true;
+        } else {
+            // renvoyer FALSE
+            return false;
+        }
+    }
+
+    private function setMaxSuspendedReached(IHasTreatment|Treatment $subtreatment): bool
+    {
+        if ($subtreatment->treatmentresults()->count() >= self::$MAX_TREATMENT_SUSPENDED_RETRY ) {
+            // -> marquer la tentative comme Max-Failed (Echec de la tentative)
+            $this->setMaxSuspended();
+            // et dispatcher le changement de statut
+            TreatmentStatusChangedEvent::dispatch($this);
+            // ... et, renvoyer TRUE
+            return true;
+        } else {
+            // renvoyer FALSE
+            return false;
         }
     }
 
@@ -375,7 +401,7 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
      */
     private function subtreatmentEndWithFailure($subtreatment) {
         // fin de la tentative de traitement
-        $this->endTreatmentWithFailure("Echec Traitement " . $subtreatment->service_class . " (" . $subtreatment->id . ")");
+        $this->endTreatmentWithFailure("Traitement " . $subtreatment->service_class . " (" . $subtreatment->id . ")");
     }
     #endregion
 }
