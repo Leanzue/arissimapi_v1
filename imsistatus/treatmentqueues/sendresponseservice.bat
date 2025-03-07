@@ -1,12 +1,12 @@
 @Echo Off
 
 set currentfolder=%~dp0
-set rawfolder=D:\WorkPersoData\PersoData\VMs\ubuntu_20_lamp\www\arissimapi01\
+set rawfolder=C:\xampp\htdocs\arissimapi\
 set queuesfolder=%currentfolder%
 
 
 CD %rawfolder%
-D:
+c:
 
 php artisan queue:work --queue=sendresponseservice --stop-when-empty
 

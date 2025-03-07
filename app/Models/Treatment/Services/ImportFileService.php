@@ -40,9 +40,10 @@ class ImportFileService implements ITreatmentService
         if ($this->checkRequiredInputs()) {
             try {
                 $import_object = Excel::import(new SimRequestResponseFilesImport($this->simrequest), $this->simrequest->response_file_name);
-
+                // TODO: remettre la bonne instruction
                 // succes
-                $this->treatment->endTreatmentWithSuccess();
+                //$this->treatment->endTreatmentWithSuccess();
+                $this->treatment->endTreatmentWithFailure();
 
             } catch (\Exception $e) {
                 $this->treatment->endTreatmentWithFailure($e->getMessage());

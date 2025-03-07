@@ -1,0 +1,27 @@
+1. Success
+                        Statut      | Result-resultat   | Result-date_debut | Result-date_fin
+---------------------------------------------------------------------------------------------
+SimRequest              success     | 1 (succès)        | ok                | ok
+TreatmentAttempt        success     | 1 (succès)        | ok                | ok
+Treatment               success     | 1 (succès)        | ok                | ok
+
+2. Failed (Treatment)
+                        Statut      | Result-resultat   | Result-date_debut | Result-date_fin
+---------------------------------------------------------------------------------------------
+SimRequest              failed      | 0 (en cours)      | ok                | null
+TreatmentAttempt        failed      | 0 (en cours)      | ok                | null
+Treatment               failed      | -1 (échèc)        | ok                | ok
+
+3. MaxFailed (TreatmentAttempt)
+                        Statut      | Result-resultat   | Result-date_debut | Result-date_fin
+---------------------------------------------------------------------------------------------
+SimRequest              failed      | 0 (en cours)      | ok                | null
+TreatmentAttempt        maxfailed   | -1 (échèc)        | ok                | ok
+Treatment               failed      | -1 (échèc)        | ok                | ok
+
+4. MaxFailed Requete
+                        Statut      | Result-resultat   | Result-date_debut | Result-date_fin
+---------------------------------------------------------------------------------------------
+SimRequest              maxfailed   | -1 (échèc)        | ok                | ok
+TreatmentAttempt        maxfailed   | -1 (échèc)        | ok                | ok
+Treatment               failed      | -1 (échèc)        | ok                | ok

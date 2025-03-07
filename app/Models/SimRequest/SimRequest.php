@@ -389,8 +389,12 @@ class SimRequest extends BaseModel implements IHasTreatment
         // si la requete est Suspend
         if ($this->isSuspended()) {
             if (! $this->setMaxSuspendedReached() ) {
-                // Lancer une nouvelle tentative, si le MAX n'est pas atteint.
-                $this->startNewAttempt();
+                if ( $this->latesttreatmentattempt->isMaxSuspended() ) {
+                    // Lancer une nouvelle tentative, si le MAX n'est pas atteint.
+                    $this->startNewAttempt();
+                } else {
+                    $this->latesttreatmentattempt->execAttempt();
+                }
             }
             return;
         }

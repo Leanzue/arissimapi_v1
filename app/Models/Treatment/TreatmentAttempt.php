@@ -315,7 +315,7 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
     /**
      * @param IHasTreatment|Treatment $subtreatment
      */
-    private function subTreatmentFailed(IHasTreatment|Treatment $subtreatment): void
+    private function subTreatmentFailed($subtreatment): void
     {
         Log::info("TreatmentAttempt - subTreatmentFailed, subtreatment->treatmentresults()->count(): " . $subtreatment->treatmentresults()->count());
         //-> re-tenter si le nombre max de tentatives est atteint
@@ -332,10 +332,10 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
     /**
      * @param IHasTreatment|Treatment $subtreatment
      */
-    public function subTreatmentSuspended(IHasTreatment|Treatment $subtreatment): void
+    public function subTreatmentSuspended($subtreatment): void
     {
         //-> re-tenter si le nombre max de tentatives est atteint
-        if ( $this->setMaxSuspendedReached() ) {
+        if ( $this->setMaxSuspendedReached($subtreatment) ) {
             $this->subtreatmentEndWithFailure($subtreatment);
         } else {
             //-> sinon Reessayer a nouveau
@@ -343,10 +343,10 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
         }
     }
 
-    private function setMaxFailedReached(IHasTreatment|Treatment $subtreatment): bool
+    private function setMaxFailedReached($subtreatment): bool
     {
         $subtreatment->load('treatmentresults');
-        if ($subtreatment->treatmentresults()->count() >= self::$MAX_TREATMENT_FAILED_RETRY ) {
+        if ( $subtreatment->treatmentresults()->count() >= self::$MAX_TREATMENT_FAILED_RETRY ) {
             // -> marquer la tentative comme Max-Failed (Echec de la tentative)
             $this->setMaxFailed();
             // et dispatcher le changement de statut
@@ -359,7 +359,7 @@ class TreatmentAttempt extends BaseModel implements IHasTreatment
         }
     }
 
-    private function setMaxSuspendedReached(IHasTreatment|Treatment $subtreatment): bool
+    private function setMaxSuspendedReached($subtreatment): bool
     {
         if ($subtreatment->treatmentresults()->count() >= self::$MAX_TREATMENT_SUSPENDED_RETRY ) {
             // -> marquer la tentative comme Max-Failed (Echec de la tentative)

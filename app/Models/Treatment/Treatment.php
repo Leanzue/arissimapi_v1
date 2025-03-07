@@ -28,6 +28,7 @@ class Treatment extends BaseModel implements IHasTreatment
     use HasFactory, HasTreatment;
 
     protected $guarded = [];
+    protected $with = ['uppertreatment'];
 
     /**
      * @var ITreatmentService

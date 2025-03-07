@@ -43,7 +43,7 @@ trait HasTreatmentResult
      * @param string $details
      * @return TreatmentResult|null
      */
-    public function startTreatment($libelle, string $details = "En cours") : ?TreatmentResult
+    public function startTreatment($libelle, $details = "En cours") : ?TreatmentResult
     {
         $newresult = $this->addNewTreatmentResult(0, $libelle, $details);
         $newresult->setStart();

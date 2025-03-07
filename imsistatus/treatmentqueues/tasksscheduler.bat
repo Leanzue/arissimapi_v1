@@ -1,12 +1,14 @@
 @Echo Off
 
-set rawfolder=D:\WorkPersoData\PersoData\VMs\ubuntu_20_lamp\www\arissimapi01\
-set queuesfolder=D:\WorkPersoData\PersoData\VMs\ubuntu_20_lamp\www\arissimapi01\imsistatus\treatmentqueues\
+set currentfolder=%~dp0
+set rawfolder=C:\xampp\htdocs\arissimapi\
+set queuesfolder=%currentfolder%imsistatus\treatmentqueues\
 
 CD %rawfolder%
 c:
 
 php artisan schedule:run 1>> NUL 2>&1
 
-
+pause
 timeout /t 5
+
