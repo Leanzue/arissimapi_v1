@@ -43,7 +43,7 @@ class ImportFileService implements ITreatmentService
                 // TODO: remettre la bonne instruction
                 // succes
                 //$this->treatment->endTreatmentWithSuccess();
-                $this->treatment->endTreatmentWithFailure();
+                $this->treatment->endTreatmentWithFailure("Pour Test Echec Traitement");
 
             } catch (\Exception $e) {
                 $this->treatment->endTreatmentWithFailure($e->getMessage());

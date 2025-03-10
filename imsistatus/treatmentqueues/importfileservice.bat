@@ -1,7 +1,7 @@
 @Echo Off
 
 set currentfolder=%~dp0
-set rawfolder=C:\xampp\htdocs\arissimapi\
+set rawfolder=C:\xampp\htdocs\arissimapi01\
 set queuesfolder=%currentfolder%
 
 
