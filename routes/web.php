@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SimController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\TreatmentController;
 use App\Http\Controllers\SimRequestController;
@@ -9,6 +10,8 @@ use App\Http\Controllers\SimResponseController;
 use App\Http\Controllers\TreatmentStatusController;
 use App\Http\Controllers\TreatmentResultController;
 use App\Http\Controllers\TreatmentAttemptController;
+
+Route::get('/', [HomeController::class, 'index']);
 
 Route::prefix('api')->group(function () {
     Route::resource('sims', SimController::class);
