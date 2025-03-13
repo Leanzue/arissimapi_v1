@@ -22,9 +22,7 @@ class TreatmentResultRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            //
-        ];
+         return TreatmentResult::defaultRules();
     }
 
     public function messages()

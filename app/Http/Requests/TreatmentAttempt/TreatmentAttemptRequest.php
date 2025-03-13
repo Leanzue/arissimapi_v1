@@ -2,8 +2,9 @@
 
 namespace App\Http\Requests\TreatmentAttempt;
 
-use App\Models\Treatment;
+use App\Models\Treatment\TreatmentAttempt;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 class TreatmentAttemptRequest extends FormRequest
 {
@@ -12,13 +13,13 @@ class TreatmentAttemptRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string,ValidationRule|array<mixed>|string>
      */
     public function messages()
     {

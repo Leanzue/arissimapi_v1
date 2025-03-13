@@ -23,7 +23,7 @@ class TreatmentResultController extends Controller
      */
     public function create()
     {
-        return view('treatementResults.create');
+        return view('treatmentResults.create');
     }
 
     /**

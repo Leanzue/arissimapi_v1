@@ -66,8 +66,9 @@ class SimResponseController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(SimResponse $simResponse)
+    public function destroy(SimResponse $simResponses)
     {
-        //
+        $simResponses->delete();
+        return redirect()->route('simResponses.index')->with('success', ' une requete supprimée avec succès.');
     }
 }

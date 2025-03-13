@@ -4,6 +4,8 @@
 namespace App\Traits;
 
 
+use Illuminate\Support\Facades\Log;
+
 trait HasDefault
 {
     public function setDefault($new_val = 1) {
@@ -40,7 +42,19 @@ trait HasDefault
     public static function bootHasDefault()
     {
         static::deleting(function ($model) {
-            // TODO: manage unsetDefault on deleting
+            //méthode unsetDefault si elle existe
+            if (method_exists($model, 'unsetDefault')) {
+                $model->unsetDefault();
+
+            } // Suppression des fichiers associés si nécessaire
+            if (property_exists($model, 'filePath') && file_exists($model->filePath)) {
+                unlink($model->filePath);
+            }
+            // Mise à jour ou suppression de données liée
+            if (method_exists($model, 'deleteRelations')) {
+                $model->deleteRelations();
+            }
+            Log::info("Le modèle avec ID {$model->id} a été préparé pour la suppression.");
             //$model->unsetDefault($model->id);
         });
     }

@@ -3,11 +3,11 @@
 namespace App\Http\Requests\status;
 
 use App\Models\Status;
-use App\Http\Requests\Sim\SimRequest;
 use Illuminate\Contracts\Validation\ValidationRule;
+use App\Http\Requests\SimRequest\SimRequestRequest;
 
 
-class StoreStatusRequest extends SimRequest
+class StoreStatusRequest extends SimRequestRequest
 {
     /**
      * Determine if the user is authorized to make this request.

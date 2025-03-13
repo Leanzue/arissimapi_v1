@@ -2,10 +2,16 @@
 
 namespace App\Http\Requests\TreatmentResult;
 
-use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Treatment\TreatmentResult;
+use App\Http\Requests\SimRequest\SimRequestRequest;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class UpdateTreatmentResultRequest extends FormRequest
+/**
+ * Class UpdateTreatmentResultRequest
+ * @package App\Http\Requests\TreatmentResult
+ * @property TreatmentResult $treatmentresult
+ */
+class UpdateTreatmentResultRequest extends SimRequestRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -18,10 +24,10 @@ class UpdateTreatmentResultRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string,ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-    {    $id = $this->route('treatmentresults');
-        return TreatmentResult::updateRules($id );
+    {
+        return TreatmentResult::updateRules($this->treatmentresult);
     }
 }

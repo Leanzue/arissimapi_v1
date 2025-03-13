@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\SimResponse;
 
+use App\Models\SimResponse;
 use Illuminate\Foundation\Http\FormRequest;
 
 class SimResponseRequest extends FormRequest
@@ -11,7 +12,7 @@ class SimResponseRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,8 +22,11 @@ class SimResponseRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            //
-        ];
+        return SimResponse::defaultRules();
+    }
+    public function messages()
+    {
+        return SimResponse::messagesRules();
+
     }
 }

@@ -4,8 +4,9 @@ namespace App\Http\Requests\TreatmentResult;
 
 use App\Models\Treatment\TreatmentResult;
 use Illuminate\Contracts\Validation\ValidationRule;
+use App\Http\Requests\SimRequest\SimRequestRequest;
 
-class StoreTreatmentResultRequest extends TreatmentResultRequest
+class StoreTreatmentResultRequest extends SimRequestRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +23,7 @@ class StoreTreatmentResultRequest extends TreatmentResultRequest
      */
         public function messages()
     {
-        return TreatmentResult::messagesRules();
+        return TreatmentResult::createRules();
     }
 
 }

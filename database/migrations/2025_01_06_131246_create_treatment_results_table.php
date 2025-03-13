@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('libelle')->default("aucun")->Comment('libelle du resultat');
             $table->timestamp('date_debut')->nullable()->comment('date de debut du traitement');
             $table->timestamp('date_fin')->nullable()->comment('date de fin du traitement');
-            $table->string('details')->comment('string description du resultat de traitement');
+            $table->string('details', 500)->comment('string description du resultat de traitement');
             $table->integer('posi')->comment('position du resultat de traitement parmi tous les resultats du model');
 
             $table->string('hastreatmentresult_type')->comment('type du modèle référencé');

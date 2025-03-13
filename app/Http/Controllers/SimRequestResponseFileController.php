@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SimRequestResponseFile;
-use App\Http\Requests\StoreSimRequestResponseFileRequest;
-use App\Http\Requests\UpdateSimRequestResponseFileRequest;
+use App\Models\SimRequest\SimRequestResponseFile;
+use App\Http\Requests\SimRequestResponseFile\StoreSimRequestResponseFileRequest;
+use App\Http\Requests\SimRequestResponseFile\UpdateSimRequestResponseFileRequest;
 
 class SimRequestResponseFileController extends Controller
 {
@@ -13,7 +13,8 @@ class SimRequestResponseFileController extends Controller
      */
     public function index()
     {
-        //
+        $simRequestResponseFiles = SimRequestResponseFile::all();
+        return view('simRequestResponseFiles.index', compact('simRequestResponseFiles'));
     }
 
     /**
@@ -21,7 +22,7 @@ class SimRequestResponseFileController extends Controller
      */
     public function create()
     {
-        //
+        return view('simRequestResponseFiles.create');
     }
 
     /**
@@ -37,15 +38,15 @@ class SimRequestResponseFileController extends Controller
      */
     public function show(SimRequestResponseFile $simRequestResponse)
     {
-        //
+        return $simRequestResponse;
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(SimRequestResponseFile $simRequestResponse)
+    public function edit(SimRequestResponseFile $simRequestResponseFiles)
     {
-        //
+        return view('simRequestResponseFiles.edit', compact('simRequestResponseFiles'));
     }
 
     /**
@@ -59,8 +60,9 @@ class SimRequestResponseFileController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(SimRequestResponseFile $simRequestResponse)
+    public function destroy(SimRequestResponseFile $simRequestResponseFiles)
     {
-        //
+        $simRequestResponseFiles->delete();
+        return redirect()->route('simRequestResponseFiles.index')->with('success', ' une requete supprimée avec succès.');
     }
 }

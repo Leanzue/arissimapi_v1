@@ -11,7 +11,10 @@ use App\Http\Controllers\TreatmentResultController;
 use App\Http\Controllers\TreatmentAttemptController;
 
 Route::prefix('api')->group(function () {
-    Route::resource('sims', SimController::class);
+    //Route::resource('sims', SimController::class)->parameters([
+       // 'simsrequested' => 'sims']);
+    Route::get('simrequested', [SimController::class, 'sims']);
+   // Route::resource('sims', SimController::class);
     Route::resource('simrequests', SimRequestController::class);
     Route::resource('simresponses', SimResponseController::class);
     Route::resource('statuses', StatusController::class);

@@ -4,7 +4,6 @@ namespace App\Models\Sim;
 
 use App\Models\BaseModel;
 use App\Models\SimRequest\SimRequest;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 

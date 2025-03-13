@@ -11,7 +11,7 @@ class TreatmentStatusController extends Controller
 {
     /**
      * Display a listing of the resource.
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Container\Container|\Illuminate\Container\TClass|object
      */
     public function index()
     {
@@ -54,7 +54,7 @@ class TreatmentStatusController extends Controller
     /**
      * Show the form for editing the specified resource.
      * @param TreatmentStatus $treatmentstatus
-     * @return \Illuminate\Contracts\View\View
+     * @return \Illuminate\Container\Container|\Illuminate\Container\TClass|object
      */
     public function edit(TreatmentStatus $treatmentstatuses)
     {

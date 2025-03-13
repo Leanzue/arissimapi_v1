@@ -43,16 +43,20 @@ class ExecBatchService implements ITreatmentService
 
         // Start Attempt
         //$result = exec('start ' . self::$BATCH_FOLDER . "\\" . self::$BATCH_NAME . " " . $this->sim->iccid . " " . $this->file_prefix . " " . $this->file_extension);
+        try {
+            if ($this->checkRequiredInputs()) {
+                $result = Process::run('start ' . self::$BATCH_FOLDER . "\\" . self::$BATCH_NAME . " " . $this->simrequest->sim->iccid . " " . $this->simrequest->file_prefix . " " . $this->simrequest->file_extension);
+                // wait for delay
+                sleep(self::$BATCH_DELAY_SECONDS);
 
-        if ($this->checkRequiredInputs()) {
-            $result = Process::run('start ' . self::$BATCH_FOLDER . "\\" . self::$BATCH_NAME . " " . $this->simrequest->sim ->iccid . " " . $this->simrequest->file_prefix . " " . $this->simrequest->file_extension);
-            // wait for delay
-            sleep(self::$BATCH_DELAY_SECONDS);
+                Log::info("ExecBatchService - " . $this->treatment);
 
-            Log::info("ExecBatchService - " . $this->treatment);
-
-            // succes
-            $this->treatment->endTreatmentWithSuccess();
+                // indiquer le succès
+                $this->treatment->endTreatmentWithSuccess();
+            }
+        } catch (\Exception $e){
+            log::error("erreur dans ExecBatchservice : ".$e->getMessage());
+            $this->treatment->endTreatmentWithFailure("Erreur lors du traitement");
         }
 
         return $this->treatment->latestTreatmentResult;
@@ -79,7 +83,6 @@ class ExecBatchService implements ITreatmentService
             $this->treatment->endTreatmentWithFailure("EXTENSION fichier non renseigne");
             return false;
         }
-
         return true;
     }
 }

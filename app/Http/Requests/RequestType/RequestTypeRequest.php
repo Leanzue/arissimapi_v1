@@ -23,11 +23,7 @@ class  RequestTypeRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            //
-        ];
     }
-
     public function messages()
     {
         return RequestType::messagesRules();

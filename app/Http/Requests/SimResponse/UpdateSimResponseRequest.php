@@ -2,27 +2,33 @@
 
 namespace App\Http\Requests\SimResponse;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Models\SimResponse;
+use App\Http\Requests\SimRequest\SimRequestRequest;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class UpdateSimResponseRequest extends FormRequest
+/**
+ * Class UpdateSimResponseRequest
+ * @package App\Http\Requests\SimResponse
+ * @property SimResponse $simResponse
+ */
+
+class UpdateSimResponseRequest extends SimRequestRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string,ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
-        return [
-            //
-        ];
+        return SimResponse::updateRules($this->simResponse);
     }
 }

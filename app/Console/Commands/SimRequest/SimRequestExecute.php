@@ -21,7 +21,7 @@ class SimRequestExecute extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'excution des requetes';
 
     /**
      * Execute the console command.

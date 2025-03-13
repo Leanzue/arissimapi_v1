@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands\SimRequest;
 
-use App\Models\SimRequest;
 use Illuminate\Console\Command;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Models\SimRequest\SimRequest;
 use App\Imports\SimRequestResponseFilesImport;
 use function Symfony\Component\Routing\Loader\Configurator\import;
 
@@ -26,12 +26,13 @@ class SimRequestImportResponseFile extends Command
 
     /**
      * Execute the console command.
+     * @param $SimRequest
      */
-    public function handle()
+    public function handle($SimRequest)
     {
         $simrequest = SimRequest::getById(1);
         //dd($simrequest->response_file_name);
-        $result = $simrequest->importFile();
-        dd($result);
+        $result = $simrequest->Importfile();
+        //dd($result);
     }
 }

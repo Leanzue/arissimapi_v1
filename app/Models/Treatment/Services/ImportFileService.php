@@ -4,6 +4,7 @@
 namespace App\Models\Treatment\Services;
 
 use App\Models\Treatment\Treatment;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\SimRequest\SimRequest;
 use App\Models\Treatment\TreatmentResult;
@@ -39,18 +40,45 @@ class ImportFileService implements ITreatmentService
 
         if ($this->checkRequiredInputs()) {
             try {
-                $import_object = Excel::import(new SimRequestResponseFilesImport($this->simrequest), $this->simrequest->response_file_name);
-                // TODO: remettre la bonne instruction
-                // succes
-                //$this->treatment->endTreatmentWithSuccess();
-                $this->treatment->endTreatmentWithFailure("Pour Test Echec Traitement");
+                $import_object = new SimRequestResponseFilesImport($this->simrequest); //Excel::import(new SimRequestResponseFilesImport($this->simrequest), $this->simrequest->response_file_name);
+                $import_object->import($this->simrequest->response_file_name, null, \Maatwebsite\Excel\Excel::CSV);
+
+                Log::info("Fin Importation");
+                Log::info("totalrows: " . $import_object->total_rows);
+                Log::info("nb_row_imported: " . $import_object->nb_row_imported);
+
+                Log::info("error_message_str: " . $import_object->error_message_str);
+                Log::info("import failures: " . json_encode( $import_object->failures() ));
+
+                // On verifie le resultat de l'importation
+                if ($import_object->nb_row_imported === 1) {
+                    $this->treatment->endTreatmentWithSuccess();
+                } else {
+                    $error_msg = "";
+
+                    foreach ($import_object->failures() as $failure) {
+                        $error_msg =  ($error_msg === "") ? "" : $error_msg . " | " ;
+                        $error_msg = $error_msg . "Row: " . $failure->row() . "; "; // row that went wrong
+                        $error_msg = $error_msg . "Attribute: " . $failure->attribute() . "; ";; // either heading key (if using heading row concern) or column index
+                        $error_msg = $error_msg . "Errors: " . json_encode( $failure->errors() ) . "; ";; // Actual error messages from Laravel validator
+                        $error_msg = $error_msg . "Values: " . $failure->values()[$failure->attribute()] . "; ";; // The values of the row that has failed.
+                    }
+
+                    if ( $import_object->error_message_str !== "" ) {
+                        $error_msg =  ($error_msg === "") ?
+                            $import_object->error_message_str :
+                            $error_msg . " | " . $import_object->error_message_str;
+                    }
+
+                    $this->treatment->endTreatmentWithFailure($error_msg);
+                }
 
             } catch (\Exception $e) {
                 $this->treatment->endTreatmentWithFailure($e->getMessage());
-                return $this->treatment->latestTreatmentResult;
+                return $this->returnServiceResult();
             }
         }
-        return $this->treatment->latestTreatmentResult;
+        return $this->returnServiceResult();
     }
 
     private function checkRequiredInputs() {
@@ -71,5 +99,10 @@ class ImportFileService implements ITreatmentService
         }
 
         return true;
+    }
+
+    private function returnServiceResult() {
+        $this->treatment->load('latestTreatmentResult');
+        return $this->treatment->latestTreatmentResult;
     }
 }

@@ -70,13 +70,13 @@ trait HasTreatmentStatus
 
     public function setSuspended()
     {
-        // application du statut Failed (en utilisant le scope)
+        // application du statut suspended (en utilisant le scope)
         $this->setRequestStatus(TreatmentStatus::getSuspendedStatus(), "Suspended");
     }
 
     public function setMaxSuspended()
     {
-        // application du statut Failed (en utilisant le scope)
+        // application du statut maxsuspended (en utilisant le scope)
         $this->setRequestStatus(TreatmentStatus::getMaxSuspendedStatus(), "Max Suspended");
     }
 

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\Facades\DB;
+use App\Models\SimRequest\SimRequest;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
 
@@ -14,7 +15,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        //{
+              //  $this->app->bind(SimRequest::class, function ($app) {
+            //     return new SimRequest();
+            //  });
+           // }
     }
 
     /**

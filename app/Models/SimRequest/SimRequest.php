@@ -440,6 +440,10 @@ class SimRequest extends BaseModel implements IHasTreatment
         } else {
             // sinon, Reessayer (appreter la requete pour la prochaine tache planifiee)
             $this->setFailed();
+            if ($subtreatment->isMaxFailed()) {
+                // cloturer le resultat en cours
+                $this->subtreatmentEndWithFailure($subtreatment);
+            }
         }
     }
     private function subTreatmentSuspended(IHasTreatment $subtreatment): void
@@ -509,7 +513,7 @@ class SimRequest extends BaseModel implements IHasTreatment
     /**
      * @param IHasTreatment|TreatmentAttempt $subtreatment
      */
-    private function subtreatmentEndWithFailure(IHasTreatment|TreatmentAttempt $subtreatment): void
+    private function subtreatmentEndWithFailure(IHasTreatment $subtreatment): void
     {
         $attempt_no = $this->treatmentattempts()->count() + 1;
         // fin de la tentative de traitement

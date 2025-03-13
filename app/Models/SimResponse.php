@@ -22,4 +22,32 @@ class SimResponse extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    #region Validation Rules
+    public static function defaultRules()
+    {
+        return [
+        ];
+    }
+
+    public static function createRules()
+    {
+        return array_merge(self::defaultRules(), [
+
+        ]);
+    }
+    public static function updateRules($id) {
+        return array_merge(self::defaultRules(),
+            [
+
+            ]
+        );
+    }
+
+    public static function messagesRules()
+    {
+        return [
+        ];
+    }
+    #endregion
 }

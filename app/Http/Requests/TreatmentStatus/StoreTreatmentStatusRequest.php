@@ -4,8 +4,9 @@ namespace App\Http\Requests\TreatmentStatus;
 
 use App\Models\Treatment\TreatmentStatus;
 use Illuminate\Contracts\Validation\ValidationRule;
+use App\Http\Requests\SimRequest\SimRequestRequest;
 
-class StoreTreatmentStatusRequest extends TreatmentStatusRequest
+class StoreTreatmentStatusRequest extends SimRequestRequest
 {
     /**
      * Determine if the user is authorized to make this request.
