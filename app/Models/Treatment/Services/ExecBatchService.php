@@ -12,11 +12,11 @@ use App\Contrats\Treatment\ITreatmentService;
 
 class ExecBatchService implements ITreatmentService
 {
+    public static $SERVER_IP = "192.168.7.50";
     /**
      * @var SimRequest
      */
     public $simrequest;
-
     /**
      * @var Treatment
      */
@@ -25,6 +25,7 @@ class ExecBatchService implements ITreatmentService
     public static $BATCH_FOLDER = "C:\\xampp\\htdocs\\arissimapi\\imsistatus";
     public static $BATCH_NAME = "execsqlaris.bat";
     public static $BATCH_DELAY_SECONDS = 5;
+
 
     public static function getQueueName()
     {
@@ -54,15 +55,29 @@ class ExecBatchService implements ITreatmentService
                 // indiquer le succès
                 $this->treatment->endTreatmentWithSuccess();
             }
-        } catch (\Exception $e){
-            log::error("erreur dans ExecBatchservice : ".$e->getMessage());
+        } catch (\Exception $e) {
+            log::error("erreur dans ExecBatchservice : " . $e->getMessage());
             $this->treatment->endTreatmentWithFailure("Erreur lors du traitement");
         }
 
         return $this->treatment->latestTreatmentResult;
     }
 
-    private function checkRequiredInputs() {
+       private function ServeurAccessible()
+       {
+           $host = self::$SERVER_IP;
+           $pingResult = shell_exec("ping -n 1 -w 5 " . escapeshellarg($host));
+
+           if (strpos($pingResult, 'TTL') !== false) {
+               Log::info("Serveur accessible à l'adresse : " . $host);
+               return true;
+           }
+           Log::warning("Impossible d'accéder au serveur : " .$host);
+           return false;
+       }
+
+
+       private function checkRequiredInputs() {
 
         if (! $this->simrequest->sim) {
             $this->treatment->endTreatmentWithFailure("Sim non renseigne");
@@ -81,6 +96,12 @@ class ExecBatchService implements ITreatmentService
 
         if (! $this->simrequest->file_extension) {
             $this->treatment->endTreatmentWithFailure("EXTENSION fichier non renseigne");
+            return false;
+        }
+
+        // PING de l'adresse IP
+        if (! $this->ServeurAccessible()) {
+            $this->treatment->endTreatmentWithFailure("Adresse IP '" . self::$SERVER_IP . "' non accessible");
             return false;
         }
         return true;

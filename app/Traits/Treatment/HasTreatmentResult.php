@@ -68,7 +68,7 @@ trait HasTreatmentResult
     public function endTreatmentWithFailure($details, $treatmentresult = null) {
         $this->load('latestTreatmentResult');
         $ending_result = is_null($treatmentresult) ? $this->latestTreatmentResult : $treatmentresult;
-        $ending_result->setFailed($details);
+        $ending_result->setFailed($details,"echec de la connection");
     }
 
     public function addNewTreatmentResult($resultat, $libelle, $details = null) : ?TreatmentResult

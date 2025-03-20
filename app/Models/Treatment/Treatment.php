@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property string $description
  *
  * @method static Treatment|null find(int $id)
+ * @method static create(string[] $array)
  */
 class Treatment extends BaseModel implements IHasTreatment
 {

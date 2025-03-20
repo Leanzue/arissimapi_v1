@@ -1,0 +1,21 @@
+ // function
+  private function ServeurAccessible()
+       {
+           $host = self::$SERVER_IP;
+           $pingResult = shell_exec("ping -n 1 -w 5 " . escapeshellarg($host));
+
+           if (strpos($pingResult, 'TTL') !== false) {
+               Log::info("Serveur accessible à l'adresse : " . $host);
+               return true;
+           }
+           Log::warning("Impossible d'accéder au serveur : " .$host);
+           return false;
+       }
+
+        // PING de l'adresse IP
+               if (! $this->ServeurAccessible()) {
+                   $this->treatment->endTreatmentWithFailure("Adresse IP '" . self::$SERVER_IP . "' non accessible");
+                   return false;
+               }
+
+

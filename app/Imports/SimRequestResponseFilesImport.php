@@ -135,7 +135,6 @@ class SimRequestResponseFilesImport implements ToModel, WithHeadingRow, WithEven
             }
         ];
     }
-
     public function prepareForValidation($data, $index)
     {
         $data['icc'] = trim($data['icc'], '-');

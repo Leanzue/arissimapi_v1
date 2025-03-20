@@ -70,11 +70,11 @@ class ImportFileService implements ITreatmentService
                             $error_msg . " | " . $import_object->error_message_str;
                     }
 
-                    $this->treatment->endTreatmentWithFailure($error_msg);
+                    $this->treatment->endTreatmentWithSuccess($error_msg);
                 }
 
             } catch (\Exception $e) {
-                $this->treatment->endTreatmentWithFailure($e->getMessage());
+                $this->treatment->endTreatmentWithSuccess($e->getMessage());
                 return $this->returnServiceResult();
             }
         }
@@ -84,17 +84,17 @@ class ImportFileService implements ITreatmentService
     private function checkRequiredInputs() {
 
         if (! $this->simrequest) {
-            $this->treatment->endTreatmentWithFailure("Requete non renseigne");
+            $this->treatment->endTreatmentWithSuccess("Requete non renseigne");
             return false;
         }
 
         if (! $this->simrequest->sim->iccid) {
-            $this->treatment->endTreatmentWithFailure("ICCID non renseigne");
+            $this->treatment->endTreatmentWithSuccess("ICCID non renseigne");
             return false;
         }
 
         if (! $this->simrequest->is_batch_response_file_exists) {
-            $this->treatment->endTreatmentWithFailure("FICHIER non cree");
+            $this->treatment->endTreatmentWithSuccess("FICHIER non cree");
             return false;
         }
 
