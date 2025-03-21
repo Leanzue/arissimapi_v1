@@ -47,6 +47,7 @@ class SendResponseService implements ITreatmentService
                 ]);
 
                 $this->treatment->endTreatmentWithSuccess();
+
             } catch (ConnectException $e) {
                 $this->treatment->endTreatmentWithFailure("status: " . 404 . "; msg: " . $e->getMessage());
             } catch (RequestException $e) {
@@ -71,7 +72,7 @@ class SendResponseService implements ITreatmentService
         }
 
         if (! $this->simrequest->latestresponsefile) {
-            $this->treatment->endTreatmentWithFailure("Objet FICHIER non existant");
+            $this->treatment->endTreatmentWithSuccess("Objet FICHIER non existant");
             return false;
         }
 

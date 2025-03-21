@@ -65,8 +65,8 @@ class SimRequestController extends Controller
     public function update(UpdateSimRequestRequest $request, SimRequest $simRequest)
     {
         $simRequest->update([
-            'description' => $request->description,
-            'adresse_ip' => $request->client_ip_address,
+            'url_response' => $request->url_response,
+            'client_key_request' => $request->client_key_request,
         ]);
 
         return $simRequest;

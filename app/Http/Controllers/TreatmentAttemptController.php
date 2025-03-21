@@ -72,7 +72,6 @@ class TreatmentAttemptController extends Controller
         $treatmentAttempt->update([
             'date_debut' => $request->date_debut,
             'date_fin' => $request->date_fin,
-            'date_fin' => $request->date_fin,
             'description' => $request->description,
         ]);
 

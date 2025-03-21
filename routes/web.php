@@ -16,8 +16,8 @@ Route::get("testsip", [TestController::class, 'testsip']);
 Route::prefix('api')->group(function () {
     //Route::resource('sims', SimController::class)->parameters([
        // 'simsrequested' => 'sims']);
-    Route::get('simrequested', [SimController::class, 'sims']);
-   // Route::resource('sims', SimController::class);
+   // Route::resource('simrequested', [SimController::class, 'sims']);
+    Route::resource('sims', SimController::class);
     Route::resource('simrequests', SimRequestController::class);
     Route::resource('simresponses', SimResponseController::class);
     Route::resource('statuses', StatusController::class);

@@ -59,13 +59,21 @@ class BaseModel extends Model
     public function deactivate() {
         $this->changeStatus(Status::inactive()->first());
     }
-      public function saveObject(bool $save) {
-    if ($save) {
-        $this->save();
+
+    public function saveObject(bool $save)
+    {
+          if ($save) {
+              $this->save();
+          }
+      }
+    #endregion
+
+    /**
+     * @return string
+     */
+    public static function getTableName()
+    {
+        return (new static())->getTable();
+       // return (new get_called_class())->getTable();
     }
-
-
-#endregion
-
-   }
 }
